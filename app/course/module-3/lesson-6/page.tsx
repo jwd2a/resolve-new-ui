@@ -1,17 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { Suspense } from 'react';
 import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import LessonVideoContent from '@/app/components/LessonVideoContent';
 import TransportationExchangeForm from '@/app/components/TransportationExchangeForm';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 
-export default function TransportationExchangePage() {
+function TransportationExchangeContent() {
   const router = useRouter();
-  const [isRemoteSessionActive, setIsRemoteSessionActive] = useState(true);
+  const searchParams = useSearchParams();
+
+  // Check if remote session mode is enabled via query param
+  const isRemoteSessionActive = searchParams.get('remote') === 'true';
 
   const courseModules = [
     {
@@ -217,5 +220,13 @@ export default function TransportationExchangePage() {
         />
       )}
     </div>
+  );
+}
+
+export default function TransportationExchangePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+      <TransportationExchangeContent />
+    </Suspense>
   );
 }
