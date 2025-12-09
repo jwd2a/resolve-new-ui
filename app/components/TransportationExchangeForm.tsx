@@ -2,8 +2,10 @@
 
 import { SparklesIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
+import SectionSigningApproval from './SectionSigningApproval';
 
 export default function TransportationExchangeForm() {
+  const [isGenerated, setIsGenerated] = useState(false);
   const [formData, setFormData] = useState({
     exchangeDistance: '',
     transportResponsibility: '',
@@ -17,13 +19,61 @@ export default function TransportationExchangeForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form submitted:', formData);
-    // In real app, this would save to API
+    setIsGenerated(true);
+    // In real app, this would save to API and generate legal language
+  };
+
+  const handleEditAndRegenerate = () => {
+    setIsGenerated(false);
+    // In real app, this would allow editing the form
+  };
+
+  const handleApprove = (parent1Initials: string, parent2Initials: string) => {
+    console.log('Approved with initials:', parent1Initials, parent2Initials);
+    // In real app, this would save approval and navigate to next section
   };
 
   const handleSkip = () => {
     console.log('Skipping transportation and exchange');
     // In real app, this would navigate or save skip status
   };
+
+  // Generate sample legal language based on form data
+  const generatedLegalText = `
+    <p><strong>[b]Transportation and Exchange[/b]</strong></p>
+
+    <p>We agree that transportation and exchange of the child(ren) is an important aspect of our timesharing arrangement. We will work together to ensure smooth and timely exchanges that prioritize the children's needs and comfort.</p>
+
+    <ul>
+      <li>Exchanges will be ${formData.exchangeDistance === 'local' ? 'local (within 50 miles)' : formData.exchangeDistance === 'long-distance' ? 'long distance (over 50 miles)' : 'conducted as agreed'}</li>
+      <li>${formData.transportResponsibility === 'receiving-parent' ? 'The receiving parent will pick up the child(ren)' : formData.transportResponsibility === 'dropping-parent' ? 'The dropping parent will deliver the child(ren)' : formData.transportResponsibility === 'shared' ? 'Both parents share transportation responsibility' : 'Transportation arrangements will be determined'}</li>
+      <li>Primary exchange location will be ${formData.primaryLocation === 'parent-home' ? "at the parent's home" : formData.primaryLocation === 'school' ? 'at school' : formData.primaryLocation === 'public-location' ? 'at a mutually agreed public location' : 'at a location to be determined'}</li>
+      <li>Grace period for lateness: ${formData.gracePeriod ? formData.gracePeriod.replace('-', ' ') : '30 minutes'}</li>
+      <li>New partners at exchanges: ${formData.newPartnersAllowed === 'yes' ? 'Allowed' : formData.newPartnersAllowed === 'no' ? 'Not allowed' : formData.newPartnersAllowed === 'by-agreement' ? 'By mutual agreement only' : 'To be determined'}</li>
+    </ul>
+
+    <p><strong>Protocol for delays or schedule changes:</strong></p>
+    <p>${formData.delayProtocol}</p>
+
+    ${formData.additionalProviders ? `<p><strong>Additional authorized transportation providers:</strong> ${formData.additionalProviders}</p>` : ''}
+
+    <p>Both parents agree to keep exchanges brief, neutral, and focused on the child(ren). We will avoid discussing adult matters during exchanges and will maintain a positive demeanor for the benefit of the child(ren).</p>
+  `;
+
+  // If generated, show signing approval
+  if (isGenerated) {
+    return (
+      <SectionSigningApproval
+        sectionTitle="Transportation and Exchange"
+        generatedText={generatedLegalText}
+        onEditAndRegenerate={handleEditAndRegenerate}
+        onApprove={handleApprove}
+        onSkip={handleSkip}
+        parent1Name="Justin Davis"
+        parent2Name="Co-Parent"
+      />
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl border border-border p-6 space-y-6">
