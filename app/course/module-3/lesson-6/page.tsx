@@ -1,13 +1,20 @@
 'use client';
 
+import { Suspense } from 'react';
 import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import LessonVideoContent from '@/app/components/LessonVideoContent';
 import TransportationExchangeForm from '@/app/components/TransportationExchangeForm';
+import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
+import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 
-export default function TransportationExchangePage() {
+function TransportationExchangeContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check if remote session mode is enabled via query param
+  const isRemoteSessionActive = searchParams.get('remote') === 'true';
 
   const courseModules = [
     {
@@ -114,6 +121,9 @@ export default function TransportationExchangePage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Remote Session Banner */}
+      {isRemoteSessionActive && <RemoteSessionBanner participantCount={2} />}
+
       {/* Header */}
       <header className="bg-white border-b border-border">
         <div className="max-w-full mx-auto px-6">
@@ -200,6 +210,23 @@ export default function TransportationExchangePage() {
           </div>
         </div>
       </div>
+
+      {/* Video Collaboration Controls */}
+      {isRemoteSessionActive && (
+        <VideoCollaborationControls
+          onToggleMicrophone={() => console.log('Toggle microphone')}
+          onToggleCamera={() => console.log('Toggle camera')}
+          onToggleChat={() => console.log('Toggle chat')}
+        />
+      )}
     </div>
+  );
+}
+
+export default function TransportationExchangePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+      <TransportationExchangeContent />
+    </Suspense>
   );
 }
