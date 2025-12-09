@@ -40,8 +40,6 @@ export default function TransportationExchangeForm() {
 
   // Generate sample legal language based on form data
   const generatedLegalText = `
-    <p><strong>[b]Transportation and Exchange[/b]</strong></p>
-
     <p>We agree that transportation and exchange of the child(ren) is an important aspect of our timesharing arrangement. We will work together to ensure smooth and timely exchanges that prioritize the children's needs and comfort.</p>
 
     <ul>
