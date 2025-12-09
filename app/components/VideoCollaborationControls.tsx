@@ -39,9 +39,10 @@ export default function VideoCollaborationControls({
   };
 
   return (
-    <div className="fixed bottom-6 left-6 flex items-end space-x-4 z-50">
-      {/* Video Feeds */}
-      <div className="flex items-end space-x-3">
+    <div className="fixed bottom-6 left-6 z-50">
+      <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4 flex items-end space-x-4">
+        {/* Video Feeds */}
+        <div className="flex items-end space-x-3">
         {/* Local Video */}
         <div className="w-32 h-24 bg-gray-900 rounded-lg overflow-hidden shadow-lg border-2 border-white">
           {localVideoFeed ? (
@@ -71,52 +72,53 @@ export default function VideoCollaborationControls({
             </div>
           )}
         </div>
-      </div>
+        </div>
 
-      {/* Control Buttons */}
-      <div className="flex items-center space-x-2">
-        {/* Microphone */}
-        <button
-          onClick={handleToggleMic}
-          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all ${
-            isMicOn
-              ? 'bg-white hover:bg-gray-100 text-gray-700'
-              : 'bg-red-500 hover:bg-red-600 text-white'
-          }`}
-          title={isMicOn ? 'Mute microphone' : 'Unmute microphone'}
-        >
-          {isMicOn ? (
-            <MicrophoneIcon className="w-5 h-5" />
-          ) : (
-            <MicrophoneOffIcon className="w-5 h-5" />
-          )}
-        </button>
+        {/* Control Buttons */}
+        <div className="flex items-center space-x-2">
+          {/* Microphone */}
+          <button
+            onClick={handleToggleMic}
+            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-all ${
+              isMicOn
+                ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+            title={isMicOn ? 'Mute microphone' : 'Unmute microphone'}
+          >
+            {isMicOn ? (
+              <MicrophoneIcon className="w-5 h-5" />
+            ) : (
+              <MicrophoneOffIcon className="w-5 h-5" />
+            )}
+          </button>
 
-        {/* Camera */}
-        <button
-          onClick={handleToggleCamera}
-          className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-all ${
-            isCameraOn
-              ? 'bg-white hover:bg-gray-100 text-gray-700'
-              : 'bg-red-500 hover:bg-red-600 text-white'
-          }`}
-          title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
-        >
-          {isCameraOn ? (
-            <VideoCameraIcon className="w-5 h-5" />
-          ) : (
-            <VideoCameraSlashIcon className="w-5 h-5" />
-          )}
-        </button>
+          {/* Camera */}
+          <button
+            onClick={handleToggleCamera}
+            className={`w-12 h-12 rounded-full flex items-center justify-center shadow-md transition-all ${
+              isCameraOn
+                ? 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                : 'bg-red-500 hover:bg-red-600 text-white'
+            }`}
+            title={isCameraOn ? 'Turn off camera' : 'Turn on camera'}
+          >
+            {isCameraOn ? (
+              <VideoCameraIcon className="w-5 h-5" />
+            ) : (
+              <VideoCameraSlashIcon className="w-5 h-5" />
+            )}
+          </button>
 
-        {/* Chat */}
-        <button
-          onClick={onToggleChat}
-          className="w-12 h-12 rounded-full bg-white hover:bg-gray-100 text-gray-700 flex items-center justify-center shadow-lg transition-all"
-          title="Open chat"
-        >
-          <ChatBubbleLeftIcon className="w-5 h-5" />
-        </button>
+          {/* Chat */}
+          <button
+            onClick={onToggleChat}
+            className="w-12 h-12 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-700 flex items-center justify-center shadow-md transition-all"
+            title="Open chat"
+          >
+            <ChatBubbleLeftIcon className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
