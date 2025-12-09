@@ -1,13 +1,18 @@
 'use client';
 
+import { useState } from 'react';
 import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/navigation';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import LessonVideoContent from '@/app/components/LessonVideoContent';
 import TransportationExchangeForm from '@/app/components/TransportationExchangeForm';
+import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
+import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 
 export default function TransportationExchangePage() {
   const router = useRouter();
+  const [isZoomMode, setIsZoomMode] = useState(false);
+  const [isRemoteSessionActive, setIsRemoteSessionActive] = useState(true);
 
   const courseModules = [
     {
@@ -112,8 +117,15 @@ export default function TransportationExchangePage() {
     router.push('/');
   };
 
+  const handleToggleZoomMode = () => {
+    setIsZoomMode(!isZoomMode);
+  };
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      {/* Remote Session Banner */}
+      {isRemoteSessionActive && <RemoteSessionBanner participantCount={2} />}
+
       {/* Header */}
       <header className="bg-white border-b border-border">
         <div className="max-w-full mx-auto px-6">
@@ -148,58 +160,73 @@ export default function TransportationExchangePage() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <CourseNavSidebar modules={courseModules} onLessonClick={handleLessonClick} />
+        {/* Sidebar - Hide in Zoom Mode */}
+        {!isZoomMode && <CourseNavSidebar modules={courseModules} onLessonClick={handleLessonClick} />}
 
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-8">
-            {/* Top Actions */}
-            <div className="flex items-center justify-between mb-6">
-              <button
-                onClick={() => router.back()}
-                className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
-              >
-                <ArrowLeftIcon className="w-5 h-5" />
-                <span className="text-sm font-medium">Back</span>
-              </button>
+          <div className={`mx-auto p-8 ${isZoomMode ? 'max-w-full' : 'max-w-7xl'}`}>
+            {/* Top Actions - Hide in Zoom Mode */}
+            {!isZoomMode && (
+              <div className="flex items-center justify-between mb-6">
+                <button
+                  onClick={() => router.back()}
+                  className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
+                >
+                  <ArrowLeftIcon className="w-5 h-5" />
+                  <span className="text-sm font-medium">Back</span>
+                </button>
 
-              <div className="flex items-center space-x-3">
-                <button
-                  onClick={handlePreviewPlan}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                >
-                  <DocumentTextIcon className="w-5 h-5" />
-                  <span>Preview Parenting Plan</span>
-                </button>
-                <button
-                  onClick={handleExitCourse}
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <ArrowRightCircleIcon className="w-5 h-5" />
-                  <span>Exit Course</span>
-                </button>
+                <div className="flex items-center space-x-3">
+                  <button
+                    onClick={handlePreviewPlan}
+                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                  >
+                    <DocumentTextIcon className="w-5 h-5" />
+                    <span>Preview Parenting Plan</span>
+                  </button>
+                  <button
+                    onClick={handleExitCourse}
+                    className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <ArrowRightCircleIcon className="w-5 h-5" />
+                    <span>Exit Course</span>
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Layout - Full width in Zoom Mode, Two Column otherwise */}
+            <div className={`grid ${isZoomMode ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'} gap-8`}>
               {/* Left Column - Video and Content */}
-              <div>
+              <div className={isZoomMode ? 'w-full' : ''}>
                 <LessonVideoContent
                   title="Transportation and Exchange"
                   keyPoints={keyPoints}
+                  onToggleZoomMode={handleToggleZoomMode}
+                  isZoomMode={isZoomMode}
                 />
               </div>
 
-              {/* Right Column - Form */}
-              <div>
-                <TransportationExchangeForm />
-              </div>
+              {/* Right Column - Form - Hide in Zoom Mode */}
+              {!isZoomMode && (
+                <div>
+                  <TransportationExchangeForm />
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Video Collaboration Controls */}
+      {isRemoteSessionActive && (
+        <VideoCollaborationControls
+          onToggleMicrophone={() => console.log('Toggle microphone')}
+          onToggleCamera={() => console.log('Toggle camera')}
+          onToggleChat={() => console.log('Toggle chat')}
+        />
+      )}
     </div>
   );
 }

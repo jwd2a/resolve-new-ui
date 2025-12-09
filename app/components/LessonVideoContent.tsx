@@ -1,20 +1,23 @@
 'use client';
 
 import { LightBulbIcon } from '@heroicons/react/24/outline';
+import { ArrowsPointingOutIcon, ArrowsPointingInIcon } from '@heroicons/react/24/outline';
 
 interface LessonVideoContentProps {
   title: string;
   videoUrl?: string;
   keyPoints: string[];
+  onToggleZoomMode?: () => void;
+  isZoomMode?: boolean;
 }
 
-export default function LessonVideoContent({ title, videoUrl, keyPoints }: LessonVideoContentProps) {
+export default function LessonVideoContent({ title, videoUrl, keyPoints, onToggleZoomMode, isZoomMode = false }: LessonVideoContentProps) {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-foreground">{title}</h1>
 
       {/* Video Player */}
-      <div className="bg-gray-900 rounded-xl overflow-hidden aspect-video relative">
+      <div className="bg-gray-900 rounded-xl overflow-hidden aspect-video relative group">
         {videoUrl ? (
           <video
             controls
@@ -42,6 +45,27 @@ export default function LessonVideoContent({ title, videoUrl, keyPoints }: Lesso
               </div>
             </div>
           </div>
+        )}
+
+        {/* Zoom Mode Toggle Button */}
+        {onToggleZoomMode && (
+          <button
+            onClick={onToggleZoomMode}
+            className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white rounded-lg px-3 py-2 flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            title={isZoomMode ? 'Exit Zoom Mode' : 'Enter Zoom Mode'}
+          >
+            {isZoomMode ? (
+              <>
+                <ArrowsPointingInIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Exit Zoom</span>
+              </>
+            ) : (
+              <>
+                <ArrowsPointingOutIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Zoom Mode</span>
+              </>
+            )}
+          </button>
         )}
       </div>
 
