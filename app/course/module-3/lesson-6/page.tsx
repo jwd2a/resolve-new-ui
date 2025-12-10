@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
@@ -8,10 +8,12 @@ import LessonVideoContent from '@/app/components/LessonVideoContent';
 import TransportationExchangeForm from '@/app/components/TransportationExchangeForm';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
+import ParentingPlanPreviewModal from '@/app/components/ParentingPlanPreviewModal';
 
 function TransportationExchangeContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [showPreviewPanel, setShowPreviewPanel] = useState(false);
 
   // Check if remote session mode is enabled via query param
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
@@ -111,8 +113,7 @@ function TransportationExchangeContent() {
   };
 
   const handlePreviewPlan = () => {
-    console.log('Preview parenting plan');
-    // In real app, this would show a preview
+    setShowPreviewPanel(true);
   };
 
   const handleExitCourse = () => {
@@ -219,6 +220,13 @@ function TransportationExchangeContent() {
           onToggleChat={() => console.log('Toggle chat')}
         />
       )}
+
+      {/* Parenting Plan Preview Panel */}
+      <ParentingPlanPreviewModal
+        isOpen={showPreviewPanel}
+        onClose={() => setShowPreviewPanel(false)}
+        currentSectionId="transportation"
+      />
     </div>
   );
 }

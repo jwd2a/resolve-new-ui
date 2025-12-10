@@ -11,12 +11,15 @@ import {
   VideoCameraIcon,
   PencilIcon,
   ChatBubbleLeftRightIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 import { CheckCircleIcon as CheckCircleSolidIcon } from '@heroicons/react/24/solid';
+import ParentingPlanPreviewModal from './components/ParentingPlanPreviewModal';
 
 export default function Home() {
   const [showMoreSections, setShowMoreSections] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
 
   const userData = {
     name: 'Sarah',
@@ -77,6 +80,13 @@ export default function Home() {
                 <a href="/parenting-plan" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                   Parenting Plan
                 </a>
+                <button
+                  onClick={() => setShowPreviewModal(true)}
+                  className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-2"
+                >
+                  <DocumentTextIcon className="w-4 h-4" />
+                  <span>Preview Plan</span>
+                </button>
               </nav>
             </div>
 
@@ -364,6 +374,12 @@ export default function Home() {
           </div>
         </div>
       </main>
+
+      {/* Parenting Plan Preview Panel */}
+      <ParentingPlanPreviewModal
+        isOpen={showPreviewModal}
+        onClose={() => setShowPreviewModal(false)}
+      />
     </div>
   );
 }
