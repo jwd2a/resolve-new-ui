@@ -94,7 +94,7 @@ export default function ScheduleCalendar({
 
   // Apply preset pattern when scheduleType changes
   useEffect(() => {
-    if (scheduleType && scheduleType !== 'custom' && scheduleType !== '') {
+    if (scheduleType !== 'custom' && scheduleType !== '') {
       const preset = SCHEDULE_PRESETS[scheduleType];
       const newDays: { [key: string]: 'parent1' | 'parent2' | undefined } = {};
 

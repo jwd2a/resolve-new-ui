@@ -241,7 +241,7 @@ function WeekdayWeekendScheduleContent() {
                     </label>
                     <select
                       value={scheduleType}
-                      onChange={(e) => setScheduleType(e.target.value)}
+                      onChange={(e) => setScheduleType(e.target.value as ScheduleType)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                     >
                       <option value="2-2-5-5">2-2-5-5 Schedule</option>
