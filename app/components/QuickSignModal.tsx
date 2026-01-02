@@ -117,22 +117,20 @@ export default function QuickSignModal({
               </div>
 
               <div className="text-sm text-gray-700 leading-relaxed">
-                {currentSection.stateData?.generatedText || (
-                  <div className="space-y-2">
-                    <p>
-                      <strong>{currentSection.title}:</strong> The parents agree to the terms as specified
-                      in this section. Both parents have reviewed and agreed to the following provisions:
-                    </p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
-                      <li>All decisions will be made jointly and in the best interest of the children</li>
-                      <li>Both parents will communicate openly and respectfully</li>
-                      <li>Changes to this agreement require mutual consent</li>
-                    </ul>
-                    <p className="text-xs text-gray-500 mt-3">
-                      This is a preview. The final language will be included in your parenting plan.
-                    </p>
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <p>
+                    <strong>{currentSection.title}:</strong> The parents agree to the terms as specified
+                    in this section. Both parents have reviewed and agreed to the following provisions:
+                  </p>
+                  <ul className="list-disc list-inside space-y-1 ml-4">
+                    <li>All decisions will be made jointly and in the best interest of the children</li>
+                    <li>Both parents will communicate openly and respectfully</li>
+                    <li>Changes to this agreement require mutual consent</li>
+                  </ul>
+                  <p className="text-xs text-gray-500 mt-3">
+                    This is a preview. The final language will be included in your parenting plan.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -155,7 +153,7 @@ export default function QuickSignModal({
                 <div>
                   <div className="text-gray-600 mb-1">{coParentName}'s Signature</div>
                   <div className="flex items-center space-x-2">
-                    {currentSection.stateData?.signatureStatus?.them ? (
+                    {currentSection.signatureStatus?.them ? (
                       <>
                         <CheckCircleIcon className="w-4 h-4 text-success" />
                         <span className="font-medium text-success">Signed</span>
