@@ -18,6 +18,9 @@ function HolidayScheduleContent() {
   // Check if remote session mode is enabled via query param
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
 
+  // Check flow type - default is 'inline', alternative is 'selection'
+  const flowType = searchParams.get('flow') || 'inline';
+
   const courseModules = [
     {
       id: 'module-1',
@@ -206,7 +209,7 @@ function HolidayScheduleContent() {
 
               {/* Right Column - Form */}
               <div>
-                <HolidayScheduleForm />
+                <HolidayScheduleForm flowType={flowType} />
               </div>
             </div>
           </div>
