@@ -7,16 +7,20 @@ import ParentingPlanPreviewModal from './components/ParentingPlanPreviewModal';
 import ParentingPlanProgress from './components/ParentingPlanProgress';
 import SessionPrompt from './components/SessionPrompt';
 import OnboardingChecklist, { OnboardingTask } from './components/OnboardingChecklist';
+import CourseOutline from './components/CourseOutline';
 import { Section } from './types/section';
 
 export default function Home() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
+  const [showCoursePreview, setShowCoursePreview] = useState(false);
 
   // Check for onboarding query param
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setIsOnboarding(params.get('onboarding') === 'true');
+    const onboardingParam = params.get('onboarding');
+    setIsOnboarding(onboardingParam === 'true' || onboardingParam === 'preview');
+    setShowCoursePreview(onboardingParam === 'preview');
   }, []);
 
   const userData = {
@@ -25,6 +29,55 @@ export default function Home() {
     coParentOnline: true,
     targetDate: new Date('2026-01-09'),
   };
+
+  // Mock course modules
+  const courseModules = [
+    {
+      id: 'module-1',
+      number: 1,
+      title: 'Welcome to Resolve',
+      description: 'Introduction to the parenting plan process and setting your goals for co-parenting success.',
+      duration: '30 min',
+      lessonCount: 4,
+      locked: true,
+    },
+    {
+      id: 'module-2',
+      number: 2,
+      title: 'Parental Responsibility',
+      description: 'Define decision-making authority, daily responsibilities, and how to handle disagreements.',
+      duration: '45 min',
+      lessonCount: 6,
+      locked: true,
+    },
+    {
+      id: 'module-3',
+      number: 3,
+      title: 'Timesharing Schedule',
+      description: 'Create a practical schedule for holidays, weekends, vacations, and day-to-day parenting time.',
+      duration: '60 min',
+      lessonCount: 8,
+      locked: true,
+    },
+    {
+      id: 'module-4',
+      number: 4,
+      title: 'Educational Decisions',
+      description: 'Plan for school choices, academic support, and parent-teacher communication.',
+      duration: '30 min',
+      lessonCount: 5,
+      locked: true,
+    },
+    {
+      id: 'module-5',
+      number: 5,
+      title: 'Final Considerations',
+      description: 'Address relocation, modifications to the plan, and finalizing your agreement.',
+      duration: '30 min',
+      lessonCount: 4,
+      locked: true,
+    },
+  ];
 
   // Mock onboarding tasks
   const onboardingTasks: OnboardingTask[] = [
@@ -177,7 +230,20 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-6 py-8">
         {isOnboarding ? (
           /* Onboarding State */
-          <OnboardingChecklist tasks={onboardingTasks} userName={userData.name} />
+          showCoursePreview ? (
+            /* Onboarding with Course Preview */
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <OnboardingChecklist tasks={onboardingTasks} userName={userData.name} />
+              </div>
+              <div className="lg:sticky lg:top-8 lg:self-start">
+                <CourseOutline modules={courseModules} />
+              </div>
+            </div>
+          ) : (
+            /* Onboarding Only */
+            <OnboardingChecklist tasks={onboardingTasks} userName={userData.name} />
+          )
         ) : (
           /* Normal Dashboard State */
           <>
