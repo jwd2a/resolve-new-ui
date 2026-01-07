@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { PlusIcon, Cog6ToothIcon, TrashIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import HolidayConfigModal from './HolidayConfigModal';
+import AddHolidayModal from './AddHolidayModal';
 
 type ScheduleType = 'normal' | 'alternating' | 'split' | 'justin' | 'michael';
 type TimingType = 'mutual' | 'specify';
@@ -46,9 +47,7 @@ interface HolidayScheduleFormProps {
 export default function HolidayScheduleForm({ flowType = 'inline' }: HolidayScheduleFormProps) {
   // State for inline flow
   const [holidays, setHolidays] = useState<Holiday[]>([]);
-  const [showAddMenu, setShowAddMenu] = useState(false);
-  const [showCustomInput, setShowCustomInput] = useState(false);
-  const [customHolidayName, setCustomHolidayName] = useState('');
+  const [addHolidayModalOpen, setAddHolidayModalOpen] = useState(false);
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [selectedHoliday, setSelectedHoliday] = useState<Holiday | null>(null);
 
@@ -59,26 +58,6 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
   const [customHolidayInput, setCustomHolidayInput] = useState('');
 
   // Shared functions
-  const addHoliday = (name: string) => {
-    const newHoliday: Holiday = {
-      id: Date.now().toString(),
-      name,
-      config: {
-        scheduleType: 'normal',
-      },
-    };
-    setHolidays([...holidays, newHoliday]);
-    setShowAddMenu(false);
-    setShowCustomInput(false);
-    setCustomHolidayName('');
-  };
-
-  const addCustomHoliday = () => {
-    if (customHolidayName.trim()) {
-      addHoliday(customHolidayName.trim());
-    }
-  };
-
   const removeHoliday = (id: string) => {
     setHolidays(holidays.filter(h => h.id !== id));
   };
@@ -129,10 +108,6 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
         return 'bg-gray-100 text-gray-700';
     }
   };
-
-  const availableHolidays = COMMON_HOLIDAYS.filter(
-    name => !holidays.some(h => h.name === name)
-  );
 
   // Selection flow functions
   const toggleHolidaySelection = (name: string) => {
@@ -193,88 +168,13 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
         <div className="p-6">
           {/* Add Holiday Button */}
           <div className="mb-6">
-            <div className="relative">
-              <button
-                onClick={() => setShowAddMenu(!showAddMenu)}
-                className="flex items-center space-x-2 px-4 py-2.5 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors border border-primary/20"
-              >
-                <PlusIcon className="w-4 h-4" />
-                <span>Add Holiday</span>
-              </button>
-
-              {/* Dropdown Menu */}
-              {showAddMenu && (
-                <div className="absolute top-full left-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-10 max-h-96 overflow-y-auto">
-                  <div className="p-2">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-3 py-2">
-                      Common Holidays
-                    </div>
-                    {availableHolidays.length > 0 ? (
-                      availableHolidays.map((name) => (
-                        <button
-                          key={name}
-                          onClick={() => addHoliday(name)}
-                          className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded transition-colors"
-                        >
-                          {name}
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-3 py-2 text-sm text-gray-500 italic">
-                        All common holidays added
-                      </div>
-                    )}
-                    <div className="border-t border-gray-200 mt-2 pt-2">
-                      <button
-                        onClick={() => {
-                          setShowCustomInput(true);
-                          setShowAddMenu(false);
-                        }}
-                        className="w-full text-left px-3 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded transition-colors"
-                      >
-                        + Add Custom Holiday
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Custom Holiday Input */}
-            {showCustomInput && (
-              <div className="mt-3 flex items-center space-x-2">
-                <input
-                  type="text"
-                  placeholder="Enter holiday name"
-                  value={customHolidayName}
-                  onChange={(e) => setCustomHolidayName(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') addCustomHoliday();
-                    if (e.key === 'Escape') {
-                      setShowCustomInput(false);
-                      setCustomHolidayName('');
-                    }
-                  }}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-                  autoFocus
-                />
-                <button
-                  onClick={addCustomHoliday}
-                  className="px-4 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
-                >
-                  Add
-                </button>
-                <button
-                  onClick={() => {
-                    setShowCustomInput(false);
-                    setCustomHolidayName('');
-                  }}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => setAddHolidayModalOpen(true)}
+              className="flex items-center justify-center space-x-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
+            >
+              <PlusIcon className="w-5 h-5" />
+              <span>Add Holiday</span>
+            </button>
           </div>
 
           {/* Holidays List */}
@@ -335,6 +235,17 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
             </button>
           </div>
         </div>
+
+        {/* Add Holiday Modal */}
+        <AddHolidayModal
+          isOpen={addHolidayModalOpen}
+          onClose={() => setAddHolidayModalOpen(false)}
+          onAddHoliday={(holiday) => {
+            setHolidays([...holidays, holiday]);
+            setAddHolidayModalOpen(false);
+          }}
+          existingHolidayNames={holidays.map(h => h.name)}
+        />
 
         {/* Config Modal */}
         {selectedHoliday && (
