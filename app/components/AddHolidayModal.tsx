@@ -55,7 +55,9 @@ export default function AddHolidayModal({
   const [selectedHolidayName, setSelectedHolidayName] = useState<string>('');
   const [customHolidayName, setCustomHolidayName] = useState<string>('');
   const [config, setConfig] = useState<HolidayConfig>({
-    scheduleType: 'normal',
+    scheduleType: 'alternating',
+    alternatingOddYearParent: 'justin',
+    timingType: 'mutual',
   });
 
   // Reset state when modal closes
@@ -64,7 +66,11 @@ export default function AddHolidayModal({
       setStep('selection');
       setSelectedHolidayName('');
       setCustomHolidayName('');
-      setConfig({ scheduleType: 'normal' });
+      setConfig({
+        scheduleType: 'alternating',
+        alternatingOddYearParent: 'justin',
+        timingType: 'mutual',
+      });
     }
   }, [isOpen]);
 
@@ -86,7 +92,7 @@ export default function AddHolidayModal({
     setConfig({
       ...config,
       scheduleType,
-      timingType: scheduleType === 'normal' ? undefined : 'mutual',
+      timingType: 'mutual',
       alternatingOddYearParent: scheduleType === 'alternating' ? 'justin' : undefined,
     });
   };
@@ -261,17 +267,11 @@ export default function AddHolidayModal({
                     onChange={(e) => handleScheduleTypeChange(e.target.value as ScheduleType)}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
                   >
-                    <option value="normal">Follow Normal Schedule</option>
                     <option value="alternating">Alternating Years</option>
                     <option value="split">Split Day</option>
                     <option value="justin">Justin has children</option>
                     <option value="michael">Michael has children</option>
                   </select>
-                  {config.scheduleType === 'normal' && (
-                    <p className="mt-2 text-sm text-gray-600">
-                      Christmas is not included here by default because it is handled in the Winter Break section, but you may add it here if that works better for you.
-                    </p>
-                  )}
                 </div>
 
                 {/* Alternating Years Options */}
@@ -307,42 +307,40 @@ export default function AddHolidayModal({
                   </div>
                 )}
 
-                {/* Holiday Timing (for all except normal schedule) */}
-                {config.scheduleType !== 'normal' && (
-                  <div className="space-y-4">
-                    <label className="block text-sm font-medium text-gray-900">
-                      Holiday Timing
+                {/* Holiday Timing */}
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-gray-900">
+                    Holiday Timing
+                  </label>
+                  <div className="space-y-3">
+                    <label className="flex items-start space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="timing"
+                        value="mutual"
+                        checked={config.timingType === 'mutual'}
+                        onChange={(e) => setConfig({ ...config, timingType: e.target.value as TimingType })}
+                        className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                      />
+                      <span className="text-sm text-gray-700">
+                        Times to be determined by mutual agreement in advance of the holiday each year
+                      </span>
                     </label>
-                    <div className="space-y-3">
-                      <label className="flex items-start space-x-3 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="timing"
-                          value="mutual"
-                          checked={config.timingType === 'mutual'}
-                          onChange={(e) => setConfig({ ...config, timingType: e.target.value as TimingType })}
-                          className="mt-1 w-4 h-4 text-primary focus:ring-primary"
-                        />
-                        <span className="text-sm text-gray-700">
-                          Times to be determined by mutual agreement in advance of the holiday each year
-                        </span>
-                      </label>
-                      <label className="flex items-start space-x-3 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="timing"
-                          value="specify"
-                          checked={config.timingType === 'specify'}
-                          onChange={(e) => setConfig({ ...config, timingType: e.target.value as TimingType })}
-                          className="mt-1 w-4 h-4 text-primary focus:ring-primary"
-                        />
-                        <span className="text-sm text-gray-700">
-                          Specify exact times for the holiday
-                        </span>
-                      </label>
-                    </div>
+                    <label className="flex items-start space-x-3 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="timing"
+                        value="specify"
+                        checked={config.timingType === 'specify'}
+                        onChange={(e) => setConfig({ ...config, timingType: e.target.value as TimingType })}
+                        className="mt-1 w-4 h-4 text-primary focus:ring-primary"
+                      />
+                      <span className="text-sm text-gray-700">
+                        Specify exact times for the holiday
+                      </span>
+                    </label>
                   </div>
-                )}
+                </div>
 
                 {/* Time Inputs (when specify is selected) */}
                 {config.timingType === 'specify' && (
