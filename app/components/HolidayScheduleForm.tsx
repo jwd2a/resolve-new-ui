@@ -137,7 +137,9 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
       id: Date.now().toString() + Math.random(),
       name,
       config: {
-        scheduleType: 'normal',
+        scheduleType: 'alternating',
+        alternatingOddYearParent: 'justin',
+        timingType: 'mutual',
       },
     }));
     setHolidays(newHolidays);
@@ -272,8 +274,8 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
         <div className="border-b border-gray-200 p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Select Holidays</h2>
           <p className="text-sm text-gray-600">
-            Choose which holidays your family celebrates together. You&apos;ll configure each one in the next step.
-            All holidays not selected will follow your normal schedule.
+            Choose the holidays that need special scheduling. If you are going to follow the same schedule, no need to select.
+            You&apos;ll configure each selected holiday in the next step.
           </p>
         </div>
 
