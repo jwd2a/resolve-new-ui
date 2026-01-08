@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { XMarkIcon, ClockIcon } from '@heroicons/react/24/outline';
 
-type ScheduleType = 'alternating' | 'split' | 'justin' | 'michael';
+type ScheduleType = 'normal' | 'alternating' | 'split' | 'justin' | 'michael';
 type TimingType = 'mutual' | 'specify';
 
 interface HolidayConfig {
