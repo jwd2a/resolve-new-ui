@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { PlusIcon, Cog6ToothIcon, TrashIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 import HolidayConfigModal from './HolidayConfigModal';
 import AddHolidayModal from './AddHolidayModal';
+import SelectHolidaysModal from './SelectHolidaysModal';
 
 type ScheduleType = 'normal' | 'alternating' | 'split' | 'justin' | 'michael';
 type TimingType = 'mutual' | 'specify';
@@ -48,6 +49,7 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
   // State
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [addHolidayModalOpen, setAddHolidayModalOpen] = useState(false);
+  const [selectHolidaysModalOpen, setSelectHolidaysModalOpen] = useState(false);
   const [configModalOpen, setConfigModalOpen] = useState(false);
   const [selectedHoliday, setSelectedHoliday] = useState<Holiday | null>(null);
   const [customHolidays, setCustomHolidays] = useState<string[]>([]);
@@ -212,74 +214,39 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
 
         {/* Content */}
         <div className="p-6">
-          {/* Holiday Selection */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Common Holidays</h3>
-            <div className="space-y-2">
-              {COMMON_HOLIDAYS.map((name) => (
-                <label
-                  key={name}
-                  className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={holidays.some(h => h.name === name)}
-                    onChange={() => toggleHoliday(name)}
-                    className="w-4 h-4 text-primary focus:ring-primary rounded"
-                  />
-                  <span className="ml-3 text-sm text-gray-900">{name}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* Custom Holidays */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Custom Holidays</h3>
-
-            {customHolidays.length > 0 && (
-              <div className="space-y-2 mb-3">
-                {customHolidays.map((name) => (
-                  <div
-                    key={name}
-                    className="flex items-center justify-between p-3 border border-gray-200 rounded-lg bg-blue-50"
-                  >
-                    <span className="text-sm text-gray-900">{name}</span>
-                    <button
-                      onClick={() => removeCustomHoliday(name)}
-                      className="ml-2 p-1 text-gray-400 hover:text-red-600 transition-colors"
-                    >
-                      <TrashIcon className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
+          {/* No Holidays State - Show Add Button */}
+          {holidays.length === 0 && (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <PlusIcon className="w-8 h-8 text-gray-400" />
               </div>
-            )}
-
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                placeholder="Add a custom holiday"
-                value={customHolidayInput}
-                onChange={(e) => setCustomHolidayInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') addCustomHolidayToList();
-                }}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No holidays selected yet</h3>
+              <p className="text-sm text-gray-600 mb-6">
+                Add holidays that need special scheduling arrangements
+              </p>
               <button
-                onClick={addCustomHolidayToList}
-                className="px-4 py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary-dark transition-colors"
+                onClick={() => setSelectHolidaysModalOpen(true)}
+                className="inline-flex items-center space-x-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
               >
-                Add
+                <PlusIcon className="w-5 h-5" />
+                <span>Add Holidays</span>
               </button>
             </div>
-          </div>
+          )}
 
-          {/* Selected Holidays */}
+          {/* Selected Holidays List */}
           {holidays.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Selected Holidays - Configure Each</h3>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-gray-900">Selected Holidays - Configure Each</h3>
+                <button
+                  onClick={() => setSelectHolidaysModalOpen(true)}
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                >
+                  <PlusIcon className="w-4 h-4" />
+                  <span>Add More</span>
+                </button>
+              </div>
               <div className="space-y-3">
                 {holidays.map((holiday) => (
                   <div
@@ -312,22 +279,6 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
                   </div>
                 ))}
               </div>
-              <button
-                onClick={() => setAddHolidayModalOpen(true)}
-                className="flex items-center justify-center space-x-2 px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors shadow-sm"
-              >
-                <PlusIcon className="w-5 h-5" />
-                <span>Add Holiday</span>
-              </button>
-            </div>
-          )}
-
-          {/* Holidays List */}
-          {holidays.length === 0 && (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <PlusIcon className="w-8 h-8 text-gray-400" />
-              </div>
             </div>
           )}
         </div>
@@ -344,13 +295,12 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
           </div>
         </div>
 
-        {/* Add Holiday Modal */}
-        <AddHolidayModal
-          isOpen={addHolidayModalOpen}
-          onClose={() => setAddHolidayModalOpen(false)}
-          onAddHoliday={(holiday) => {
-            setHolidays([...holidays, holiday]);
-            setAddHolidayModalOpen(false);
+        {/* Select Holidays Modal */}
+        <SelectHolidaysModal
+          isOpen={selectHolidaysModalOpen}
+          onClose={() => setSelectHolidaysModalOpen(false)}
+          onAddHolidays={(newHolidays) => {
+            setHolidays([...holidays, ...newHolidays]);
           }}
           existingHolidayNames={holidays.map(h => h.name)}
         />
