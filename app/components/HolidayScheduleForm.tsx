@@ -155,6 +155,10 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
     }
   };
 
+  // Check if all holidays are configured
+  const unconfiguredHolidays = holidays.filter(h => h.config.scheduleType === 'normal');
+  const allHolidaysConfigured = holidays.length > 0 && unconfiguredHolidays.length === 0;
+
   // Selection flow functions
   const toggleHolidaySelection = (name: string) => {
     setSelectedHolidayNames(prev =>
@@ -285,7 +289,22 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
 
         {/* Footer */}
         <div className="border-t border-gray-200 p-6">
-          <button className="w-full px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors mb-3">
+          {/* Validation Message */}
+          {holidays.length > 0 && unconfiguredHolidays.length > 0 && (
+            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800 font-medium">
+                {unconfiguredHolidays.length} {unconfiguredHolidays.length === 1 ? 'holiday needs' : 'holidays need'} to be configured before continuing
+              </p>
+              <p className="text-xs text-amber-700 mt-1">
+                Click the &quot;Configure&quot; button for each holiday to set scheduling details
+              </p>
+            </div>
+          )}
+
+          <button
+            disabled={!allHolidaysConfigured && holidays.length > 0}
+            className="w-full px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors mb-3 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:hover:bg-gray-300"
+          >
             Continue
           </button>
           <div className="text-center">
