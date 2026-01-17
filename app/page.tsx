@@ -319,17 +319,13 @@ export default function Home() {
                   lastSessionDate={new Date('2026-01-01')}
                   onStartInPerson={handleStartInPerson}
                   onStartRemote={handleStartRemote}
-                  onPreviewCourse={() => window.location.href = '/course'}
                   canStartCourse={!showPreCourse || (preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
                 />
 
                 {/* Parenting Plan Progress - THE MAIN COMPONENT */}
                 <ParentingPlanProgress
-                  sections={showPreCourse && !(preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)
-                    ? mockSections.map(s => ({ ...s, state: 'not-started' as const }))
-                    : mockSections}
+                  sections={mockSections}
                   onSectionClick={handleSectionClick}
-                  isPreview={showPreCourse && !(preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
                 />
               </div>
 
