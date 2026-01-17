@@ -223,6 +223,9 @@ export default function Home() {
                   <a href="/parenting-plan" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                     Parenting Plan
                   </a>
+                  <a href="/family-info" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    Family Info
+                  </a>
                   <button
                     onClick={() => setShowPreviewModal(true)}
                     className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-2"
