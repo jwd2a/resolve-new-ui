@@ -8,6 +8,7 @@ import SectionStatusBadge from './SectionStatusBadge';
 interface ParentingPlanProgressProps {
   sections: Section[];
   onSectionClick?: (section: Section) => void;
+  isPreview?: boolean;
 }
 
 const categoryLabels: Record<SectionCategory, string> = {
@@ -17,7 +18,7 @@ const categoryLabels: Record<SectionCategory, string> = {
   'other': 'Final Considerations',
 };
 
-export default function ParentingPlanProgress({ sections, onSectionClick }: ParentingPlanProgressProps) {
+export default function ParentingPlanProgress({ sections, onSectionClick, isPreview = false }: ParentingPlanProgressProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<SectionCategory>>(
     new Set(['timesharing', 'decision-making', 'communication', 'other'])
   );
@@ -49,17 +50,35 @@ export default function ParentingPlanProgress({ sections, onSectionClick }: Pare
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-2xl font-bold text-gray-900">Your Parenting Plan</h2>
-          <div className="text-sm font-semibold text-gray-600">
-            {completedSections} of {totalSections} sections complete
+          <div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {isPreview ? 'Your Parenting Plan' : 'Your Parenting Plan'}
+            </h2>
+            {isPreview && (
+              <p className="text-sm text-gray-500 mt-1">
+                Here's what you'll create together
+              </p>
+            )}
           </div>
+          {!isPreview && (
+            <div className="text-sm font-semibold text-gray-600">
+              {completedSections} of {totalSections} sections complete
+            </div>
+          )}
+          {isPreview && (
+            <div className="text-sm font-medium text-gray-500">
+              {totalSections} sections
+            </div>
+          )}
         </div>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary rounded-full transition-all duration-500"
-            style={{ width: `${(completedSections / totalSections) * 100}%` }}
-          />
-        </div>
+        {!isPreview && (
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary rounded-full transition-all duration-500"
+              style={{ width: `${(completedSections / totalSections) * 100}%` }}
+            />
+          </div>
+        )}
       </div>
 
       {/* Category Sections */}
