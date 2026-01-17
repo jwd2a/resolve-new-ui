@@ -8,19 +8,47 @@ import ParentingPlanProgress from './components/ParentingPlanProgress';
 import SessionPrompt from './components/SessionPrompt';
 import OnboardingChecklist, { OnboardingTask } from './components/OnboardingChecklist';
 import CourseOutline from './components/CourseOutline';
+import PreCourseRequirementsBanner, { PreCourseRequirementsState } from './components/PreCourseRequirementsBanner';
 import { Section } from './types/section';
 
 export default function Home() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [showCoursePreview, setShowCoursePreview] = useState(false);
+  const [showPreCourse, setShowPreCourse] = useState(false);
+  const [preCourseState, setPreCourseState] = useState<PreCourseRequirementsState>({
+    coParentInvited: false,
+    waiversSigned: false,
+    paymentComplete: false,
+  });
 
-  // Check for onboarding query param
+  // Check for query params
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
+    // Onboarding params
     const onboardingParam = params.get('onboarding');
     setIsOnboarding(onboardingParam === 'true' || onboardingParam === 'preview');
     setShowCoursePreview(onboardingParam === 'preview');
+
+    // Pre-course requirements params
+    // ?precourse=true shows pre-course requirements view
+    // Individual states: ?invited=true&waivers=true&paid=true
+    const preCourseParam = params.get('precourse');
+    if (preCourseParam === 'true' || preCourseParam !== null) {
+      setShowPreCourse(true);
+
+      // Check individual requirement states
+      const invited = params.get('invited') === 'true';
+      const waivers = params.get('waivers') === 'true';
+      const paid = params.get('paid') === 'true';
+
+      setPreCourseState({
+        coParentInvited: invited,
+        waiversSigned: waivers,
+        paymentComplete: paid,
+      });
+    }
   }, []);
 
   const userData = {
@@ -247,6 +275,16 @@ export default function Home() {
         ) : (
           /* Normal Dashboard State */
           <>
+            {/* Pre-Course Requirements Banner */}
+            {showPreCourse && (
+              <PreCourseRequirementsBanner
+                state={preCourseState}
+                onInviteCoParent={() => alert('Open co-parent invitation flow')}
+                onSignWaivers={() => alert('Open waivers signing flow')}
+                onCompletePayment={() => alert('Open payment flow')}
+              />
+            )}
+
             {/* Welcome Section */}
             <div className="flex items-start justify-between mb-8">
               <div>
@@ -256,7 +294,15 @@ export default function Home() {
               <div className="text-right">
                 <div className="text-sm text-gray-600 mb-1">Target completion</div>
                 <div className="text-lg font-semibold text-gray-900">{formatDate(userData.targetDate)}</div>
-                <div className="text-sm text-primary">{daysRemaining} days remaining</div>
+                {daysRemaining > 0 ? (
+                  <div className="text-sm text-primary">{daysRemaining} days remaining</div>
+                ) : daysRemaining === 0 ? (
+                  <div className="text-sm text-amber-600">Due today</div>
+                ) : (
+                  <button className="text-sm text-amber-600 hover:text-amber-700 underline underline-offset-2">
+                    Set a new target date
+                  </button>
+                )}
               </div>
             </div>
 
@@ -270,12 +316,17 @@ export default function Home() {
                   lastSessionDate={new Date('2026-01-01')}
                   onStartInPerson={handleStartInPerson}
                   onStartRemote={handleStartRemote}
+                  onPreviewCourse={() => window.location.href = '/course'}
+                  canStartCourse={!showPreCourse || (preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
                 />
 
                 {/* Parenting Plan Progress - THE MAIN COMPONENT */}
                 <ParentingPlanProgress
-                  sections={mockSections}
+                  sections={showPreCourse && !(preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)
+                    ? mockSections.map(s => ({ ...s, state: 'not-started' as const }))
+                    : mockSections}
                   onSectionClick={handleSectionClick}
+                  isPreview={showPreCourse && !(preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
                 />
               </div>
 
