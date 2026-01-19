@@ -98,14 +98,12 @@ export default function SelectHolidaysModal({
   };
 
   const handleAddHolidays = () => {
-    // Create Holiday objects with default configuration
+    // Create Holiday objects with unconfigured state - user must configure each one
     const newHolidays: Holiday[] = selectedHolidayNames.map(name => ({
       id: Date.now().toString() + Math.random(),
       name,
       config: {
-        scheduleType: 'alternating',
-        alternatingOddYearParent: 'justin',
-        timingType: 'mutual',
+        scheduleType: 'normal',
       },
     }));
     onAddHolidays(newHolidays);
