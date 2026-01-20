@@ -17,7 +17,7 @@ export default function Home() {
   const [showCoursePreview, setShowCoursePreview] = useState(false);
   const [showPreCourse, setShowPreCourse] = useState(false);
   const [preCourseState, setPreCourseState] = useState<PreCourseRequirementsState>({
-    coParentInvited: false,
+    coParentInvited: true,
     waiversSigned: false,
     paymentComplete: false,
   });
@@ -38,8 +38,8 @@ export default function Home() {
     if (preCourseParam === 'true' || preCourseParam !== null) {
       setShowPreCourse(true);
 
-      // Check individual requirement states
-      const invited = params.get('invited') === 'true';
+      // Check individual requirement states (default invited to true for demo)
+      const invited = params.get('invited') !== 'false';
       const waivers = params.get('waivers') === 'true';
       const paid = params.get('paid') === 'true';
 
@@ -156,25 +156,25 @@ export default function Home() {
   // Mock parenting plan sections with new structure
   const mockSections: Section[] = [
     // Timesharing
-    { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
-    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'completed', estimatedTime: '15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
-    { id: 'weekday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekday Schedule', description: 'Define weekday schedule', state: 'not-started', estimatedTime: '15 min', formUrl: '/forms/weekday' },
-    { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'not-started', estimatedTime: '20 min', formUrl: '/forms/breaks' },
-    { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'completed', estimatedTime: '15 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
+    { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '~20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
+    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'completed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
+    { id: 'weekday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekday Schedule', description: 'Define weekday schedule', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/weekday' },
+    { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'not-started', estimatedTime: '~20 min', formUrl: '/forms/breaks' },
+    { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'completed', estimatedTime: '~10 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
 
     // Decision-Making
-    { id: 'shared-decisions', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Shared Decision-Making', description: 'Major decisions requiring both parents', state: 'signed', estimatedTime: '10 min', formUrl: '/forms/shared-decisions', signatureStatus: { you: true, them: true } },
-    { id: 'day-to-day', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Day-to-Day Decisions', description: 'Routine daily decisions', state: 'completed', estimatedTime: '10 min', formUrl: '/forms/daily', signatureStatus: { you: false, them: false } },
-    { id: 'extracurricular', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Extra-curricular Activities', description: 'Sports, clubs, and activities', state: 'not-started', estimatedTime: '15 min', formUrl: '/forms/activities' },
-    { id: 'healthcare', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Healthcare Decisions', description: 'Medical care and insurance', state: 'not-started', estimatedTime: '15 min', formUrl: '/forms/healthcare' },
+    { id: 'shared-decisions', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Shared Decision-Making', description: 'Major decisions requiring both parents', state: 'signed', estimatedTime: '~15 min', formUrl: '/forms/shared-decisions', signatureStatus: { you: true, them: true } },
+    { id: 'day-to-day', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Day-to-Day Decisions', description: 'Routine daily decisions', state: 'completed', estimatedTime: '~10 min', formUrl: '/forms/daily', signatureStatus: { you: false, them: false } },
+    { id: 'extracurricular', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Extra-curricular Activities', description: 'Sports, clubs, and activities', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/activities' },
+    { id: 'healthcare', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Healthcare Decisions', description: 'Medical care and insurance', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/healthcare' },
 
     // Communication
-    { id: 'communication-methods', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Communication Protocols', description: 'How you\'ll communicate', state: 'not-started', estimatedTime: '10 min', formUrl: '/forms/communication' },
-    { id: 'information-sharing', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Information Sharing', description: 'Sharing important updates', state: 'not-started', estimatedTime: '10 min', formUrl: '/forms/info-sharing' },
+    { id: 'communication-methods', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Communication Protocols', description: 'How you\'ll communicate', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/communication' },
+    { id: 'information-sharing', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Information Sharing', description: 'Sharing important updates', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/info-sharing' },
 
     // Other
-    { id: 'relocation', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Relocation', description: 'Plans if either parent moves', state: 'not-started', estimatedTime: '15 min', formUrl: '/forms/relocation' },
-    { id: 'modifications', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Changes & Modifications', description: 'How to update this plan', state: 'not-started', estimatedTime: '10 min', formUrl: '/forms/modifications' },
+    { id: 'relocation', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Relocation', description: 'Plans if either parent moves', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/relocation' },
+    { id: 'modifications', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Changes & Modifications', description: 'How to update this plan', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/modifications' },
   ];
 
   const handleSectionClick = (section: Section) => {
@@ -278,16 +278,6 @@ export default function Home() {
         ) : (
           /* Normal Dashboard State */
           <>
-            {/* Pre-Course Requirements Banner */}
-            {showPreCourse && (
-              <PreCourseRequirementsBanner
-                state={preCourseState}
-                onInviteCoParent={() => alert('Open co-parent invitation flow')}
-                onSignWaivers={() => alert('Open waivers signing flow')}
-                onCompletePayment={() => alert('Open payment flow')}
-              />
-            )}
-
             {/* Welcome Section */}
             <div className="flex items-start justify-between mb-8">
               <div>
@@ -326,11 +316,22 @@ export default function Home() {
                 <ParentingPlanProgress
                   sections={mockSections}
                   onSectionClick={handleSectionClick}
+                  previewMode={showPreCourse && !(preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
                 />
               </div>
 
               {/* Right Sidebar */}
               <div className="space-y-6">
+                {/* Pre-Course Requirements */}
+                {showPreCourse && (
+                  <PreCourseRequirementsBanner
+                    state={preCourseState}
+                    onInviteCoParent={() => alert('Open co-parent invitation flow')}
+                    onSignWaivers={() => alert('Open waivers signing flow')}
+                    onCompletePayment={() => alert('Open payment flow')}
+                  />
+                )}
+
                 {/* Need Assistance */}
                 <div className="bg-white border border-gray-200 rounded-xl p-6">
                   <h3 className="font-semibold text-gray-900 mb-2">Need assistance?</h3>
