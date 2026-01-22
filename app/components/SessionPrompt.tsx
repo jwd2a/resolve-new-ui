@@ -20,7 +20,7 @@ export default function SessionPrompt({
   canStartCourse = true,
 }: SessionPromptProps) {
   return (
-    <div className="bg-slate-50 rounded-xl p-6">
+    <div className="bg-white border border-gray-200 rounded-xl p-6">
       {/* Section Title */}
       <div className="mb-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-1">
