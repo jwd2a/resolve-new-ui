@@ -282,7 +282,7 @@ export default function Home() {
             <div className="flex items-start justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {userData.name}</h1>
-                <p className="text-gray-600">You're making great progress on your parenting plan.</p>
+                <p className="text-gray-600">Collaborate with your co-parent to complete your parenting plan.</p>
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-600 mb-1">Target completion</div>
