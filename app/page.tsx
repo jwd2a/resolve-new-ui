@@ -17,9 +17,9 @@ export default function Home() {
   const [showCoursePreview, setShowCoursePreview] = useState(false);
   const [showPreCourse, setShowPreCourse] = useState(false);
   const [preCourseState, setPreCourseState] = useState<PreCourseRequirementsState>({
-    coParentInvited: true,
-    waiversSigned: false,
-    paymentComplete: false,
+    inviteStatus: 'accepted',
+    waiverStatus: { you: false, them: false },
+    paymentStatus: { you: false, them: false },
   });
 
   // Check for query params
@@ -33,20 +33,24 @@ export default function Home() {
 
     // Pre-course requirements params
     // ?precourse=true shows pre-course requirements view
-    // Individual states: ?invited=true&waivers=true&paid=true
+    // Invite states: ?invite=not_invited|invited|accepted
+    // Individual states: ?waiver_you=true&waiver_them=true&paid_you=true&paid_them=true
     const preCourseParam = params.get('precourse');
     if (preCourseParam === 'true' || preCourseParam !== null) {
       setShowPreCourse(true);
 
-      // Check individual requirement states (default invited to true for demo)
-      const invited = params.get('invited') !== 'false';
-      const waivers = params.get('waivers') === 'true';
-      const paid = params.get('paid') === 'true';
+      // Check individual requirement states
+      const inviteParam = params.get('invite') as 'not_invited' | 'invited' | 'accepted' | null;
+      const inviteStatus = inviteParam || 'accepted'; // Default to accepted for demo
+      const waiverYou = params.get('waiver_you') === 'true';
+      const waiverThem = params.get('waiver_them') === 'true';
+      const paidYou = params.get('paid_you') === 'true';
+      const paidThem = params.get('paid_them') === 'true';
 
       setPreCourseState({
-        coParentInvited: invited,
-        waiversSigned: waivers,
-        paymentComplete: paid,
+        inviteStatus,
+        waiverStatus: { you: waiverYou, them: waiverThem },
+        paymentStatus: { you: paidYou, them: paidThem },
       });
     }
   }, []);
@@ -309,14 +313,14 @@ export default function Home() {
                   lastSessionDate={new Date('2026-01-01')}
                   onStartInPerson={handleStartInPerson}
                   onStartRemote={handleStartRemote}
-                  canStartCourse={!showPreCourse || (preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
+                  canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
                 />
 
                 {/* Parenting Plan Progress - THE MAIN COMPONENT */}
                 <ParentingPlanProgress
                   sections={mockSections}
                   onSectionClick={handleSectionClick}
-                  previewMode={showPreCourse && !(preCourseState.coParentInvited && preCourseState.waiversSigned && preCourseState.paymentComplete)}
+                  previewMode={showPreCourse && !(preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
                 />
               </div>
 
