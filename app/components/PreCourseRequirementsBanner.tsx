@@ -5,6 +5,8 @@ import {
   UserGroupIcon,
   DocumentTextIcon,
   CreditCardIcon,
+  ClockIcon,
+  EnvelopeIcon,
 } from '@heroicons/react/24/outline';
 
 // Detailed status for items requiring both parties
@@ -13,8 +15,11 @@ export interface PartyStatus {
   them: boolean;
 }
 
+// Invitation status for co-parent
+export type InviteStatus = 'not_invited' | 'invited' | 'accepted';
+
 export interface PreCourseRequirementsState {
-  coParentInvited: boolean;
+  inviteStatus: InviteStatus;
   waiverStatus: PartyStatus; // Both parties need to sign
   paymentStatus: PartyStatus; // Both parties need to pay
 }
@@ -39,32 +44,58 @@ function getPartyStatusText(status: PartyStatus): { you: string; them: string } 
   };
 }
 
+// Helper to get invite status display info
+function getInviteStatusInfo(status: InviteStatus): { text: string; color: string; icon: 'envelope' | 'clock' | 'check' } {
+  switch (status) {
+    case 'not_invited':
+      return { text: 'Not yet invited', color: 'text-gray-500', icon: 'envelope' };
+    case 'invited':
+      return { text: 'Invite sent, waiting for response', color: 'text-amber-600', icon: 'clock' };
+    case 'accepted':
+      return { text: 'Accepted', color: 'text-success', icon: 'check' };
+  }
+}
+
 export default function PreCourseRequirementsBanner({
   state,
   onInviteCoParent,
   onSignWaivers,
   onCompletePayment,
 }: PreCourseRequirementsBannerProps) {
-  const { coParentInvited, waiverStatus, paymentStatus } = state;
+  const { inviteStatus, waiverStatus, paymentStatus } = state;
 
+  const inviteComplete = inviteStatus === 'accepted';
   const waiversComplete = isBothComplete(waiverStatus);
   const paymentComplete = isBothComplete(paymentStatus);
-  const allComplete = coParentInvited && waiversComplete && paymentComplete;
+  const allComplete = inviteComplete && waiversComplete && paymentComplete;
 
   // Don't render if all requirements are complete
   if (allComplete) {
     return null;
   }
 
+  // Get invite CTA based on status
+  const getInviteCta = () => {
+    switch (inviteStatus) {
+      case 'not_invited':
+        return 'Send Invite';
+      case 'invited':
+        return 'View Status';
+      case 'accepted':
+        return '';
+    }
+  };
+
   const requirements = [
     {
       id: 'invite',
       label: 'Invite Co-Parent',
       icon: UserGroupIcon,
-      complete: coParentInvited,
+      complete: inviteComplete,
       onAction: onInviteCoParent,
-      cta: 'Send Invite',
-      partyStatus: null, // Single-party item
+      cta: getInviteCta(),
+      partyStatus: null, // Uses inviteStatus instead
+      inviteStatus: inviteStatus,
     },
     {
       id: 'waivers',
@@ -74,6 +105,7 @@ export default function PreCourseRequirementsBanner({
       onAction: onSignWaivers,
       cta: waiverStatus.you ? 'View Status' : 'Sign Now',
       partyStatus: waiverStatus,
+      inviteStatus: null,
     },
     {
       id: 'payment',
@@ -83,6 +115,7 @@ export default function PreCourseRequirementsBanner({
       onAction: onCompletePayment,
       cta: paymentStatus.you ? 'View Status' : 'Pay Now',
       partyStatus: paymentStatus,
+      inviteStatus: null,
     },
   ];
 
@@ -114,8 +147,9 @@ export default function PreCourseRequirementsBanner({
             );
           }
 
-          // For incomplete items with party status
+          // For incomplete items with party status or invite status
           const statusText = req.partyStatus ? getPartyStatusText(req.partyStatus) : null;
+          const inviteInfo = req.inviteStatus ? getInviteStatusInfo(req.inviteStatus) : null;
 
           return (
             <button
@@ -130,6 +164,7 @@ export default function PreCourseRequirementsBanner({
                 <span className="text-sm font-medium text-gray-900 block">
                   {req.label}
                 </span>
+                {/* Party status for waivers/payment */}
                 {statusText && (
                   <div className="flex items-center gap-3 mt-1">
                     <span className={`text-xs flex items-center gap-1 ${req.partyStatus?.you ? 'text-success' : 'text-gray-500'}`}>
@@ -139,6 +174,17 @@ export default function PreCourseRequirementsBanner({
                     <span className={`text-xs flex items-center gap-1 ${req.partyStatus?.them ? 'text-success' : 'text-gray-500'}`}>
                       {req.partyStatus?.them && <CheckIcon className="w-3 h-3" />}
                       Co-Parent: {statusText.them}
+                    </span>
+                  </div>
+                )}
+                {/* Invite status for co-parent invitation */}
+                {inviteInfo && (
+                  <div className="flex items-center gap-1 mt-1">
+                    {inviteInfo.icon === 'clock' && <ClockIcon className="w-3 h-3 text-amber-500" />}
+                    {inviteInfo.icon === 'envelope' && <EnvelopeIcon className="w-3 h-3 text-gray-400" />}
+                    {inviteInfo.icon === 'check' && <CheckIcon className="w-3 h-3 text-success" />}
+                    <span className={`text-xs ${inviteInfo.color}`}>
+                      {inviteInfo.text}
                     </span>
                   </div>
                 )}
