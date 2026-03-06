@@ -115,14 +115,14 @@ export default function ChildrenPage() {
       <div className="flex justify-between">
         <button
           onClick={handleBack}
-          className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+          className="px-6 py-3.5 sm:py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleContinue}
           disabled={!canContinue}
-          className="px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3.5 sm:py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

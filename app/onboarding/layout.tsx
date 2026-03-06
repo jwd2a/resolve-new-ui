@@ -39,7 +39,7 @@ function StepperContent({ children }: { children: React.ReactNode }) {
       </div>
 
       {/* Stepper */}
-      <div className="flex justify-center px-4 pb-8">
+      <div className="flex justify-center px-2 sm:px-4 pb-6 sm:pb-8">
         <div className="flex items-center space-x-0">
           {steps.map((step, index) => {
             const Icon = step.icon;
@@ -52,20 +52,20 @@ function StepperContent({ children }: { children: React.ReactNode }) {
                 <div className="flex flex-col items-center">
                   {isComplete ? (
                     <Link href={step.path}>
-                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
-                        <CheckIcon className="w-5 h-5 text-primary" />
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white flex items-center justify-center cursor-pointer hover:scale-105 transition-transform">
+                        <CheckIcon className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
                       </div>
                     </Link>
                   ) : isCurrent ? (
-                    <div className="w-10 h-10 rounded-full border-2 border-white bg-white/20 backdrop-blur flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-white" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white bg-white/20 backdrop-blur flex items-center justify-center">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
                   ) : (
-                    <div className="w-10 h-10 rounded-full border-2 border-white/30 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-white/40" />
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-white/30 flex items-center justify-center">
+                      <Icon className="w-4 h-4 sm:w-5 sm:h-5 text-white/40" />
                     </div>
                   )}
-                  <span className={`mt-2 text-xs font-medium ${
+                  <span className={`mt-1.5 sm:mt-2 text-[10px] sm:text-xs font-medium hidden sm:block ${
                     isCurrent ? 'text-white' : isComplete ? 'text-white/90' : 'text-white/40'
                   }`}>
                     {step.label}
@@ -74,7 +74,7 @@ function StepperContent({ children }: { children: React.ReactNode }) {
 
                 {/* Connector Line */}
                 {index < steps.length - 1 && (
-                  <div className={`w-12 sm:w-20 h-0.5 mx-1 mt-[-20px] ${
+                  <div className={`w-6 sm:w-12 md:w-20 h-0.5 mx-0.5 sm:mx-1 sm:mt-[-20px] ${
                     completedSteps.has(steps[index + 1].number) || (isComplete && index + 1 === currentStepIndex)
                       ? 'bg-white'
                       : 'bg-white/30'
@@ -88,7 +88,7 @@ function StepperContent({ children }: { children: React.ReactNode }) {
 
       {/* Content Card */}
       <div className="flex-1 flex justify-center px-4 pb-8">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-8 sm:p-10 self-start">
+        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl p-5 sm:p-8 md:p-10 self-start">
           {children}
         </div>
       </div>
