@@ -59,13 +59,13 @@ export default function CoParentPage() {
           onChange={(e) => updateData({ coParentAddress: e.target.value })}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400 mb-4"
         />
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
           <input
             type="text"
             placeholder="City"
             value={data.coParentCity}
             onChange={(e) => updateData({ coParentCity: e.target.value })}
-            className="col-span-3 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
+            className="col-span-2 sm:col-span-3 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
           />
           <input
             type="text"
@@ -79,7 +79,7 @@ export default function CoParentPage() {
             placeholder="ZIP"
             value={data.coParentZip}
             onChange={(e) => updateData({ coParentZip: e.target.value })}
-            className="col-span-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
+            className="col-span-1 sm:col-span-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
           />
         </div>
       </div>
@@ -138,13 +138,13 @@ export default function CoParentPage() {
       <div className="flex justify-between">
         <button
           onClick={handleBack}
-          className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+          className="px-6 py-3.5 sm:py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleContinue}
-          className="px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
+          className="px-8 py-3.5 sm:py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors"
         >
           Continue
         </button>
