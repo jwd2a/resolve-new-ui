@@ -1,8 +1,11 @@
 // Three-state model for session-based parenting plan
 export type SectionState =
-  | 'not-started'  // Section not yet completed
-  | 'completed'    // Section finished in a session
-  | 'signed';      // Both parents have signed
+  | 'not-started'
+  | 'draft'
+  | 'in-review'
+  | 'contested'
+  | 'agreed'
+  | 'signed'
 
 // Category types for organizing sections
 export type SectionCategory =
@@ -14,6 +17,14 @@ export type SectionCategory =
 export interface SignatureStatus {
   you: boolean;
   them: boolean;
+}
+
+export interface EditEntry {
+  fieldId: string;
+  previousValue: any;
+  newValue: any;
+  editedBy: 'you' | 'them';
+  editedAt: Date;
 }
 
 export interface Section {
@@ -34,6 +45,10 @@ export interface Section {
 
   // Signature data
   signatureStatus?: SignatureStatus;
+  draftData?: any;
+  draftedBy?: 'you' | 'them';
+  currentTurn?: 'you' | 'them';
+  editHistory?: EditEntry[];
 }
 
 // Helper function to get sections by category
@@ -60,7 +75,7 @@ export function getCategoryCompletion(sections: Section[], category: SectionCate
   const categorySections = sections.filter(s => s.category === category);
   return {
     total: categorySections.length,
-    completed: categorySections.filter(s => s.state === 'completed' || s.state === 'signed').length,
+    completed: categorySections.filter(s => s.state === 'agreed' || s.state === 'signed').length,
     signed: categorySections.filter(s => s.state === 'signed').length,
   };
 }
