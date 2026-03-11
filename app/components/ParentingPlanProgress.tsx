@@ -9,6 +9,7 @@ interface ParentingPlanProgressProps {
   sections: Section[];
   onSectionClick?: (section: Section) => void;
   previewMode?: boolean;
+  coParentName?: string;
 }
 
 const categoryLabels: Record<SectionCategory, string> = {
@@ -18,7 +19,32 @@ const categoryLabels: Record<SectionCategory, string> = {
   'other': 'Final Considerations',
 };
 
-export default function ParentingPlanProgress({ sections, onSectionClick, previewMode = false }: ParentingPlanProgressProps) {
+const getAsyncStatusMessage = (section: Section, coParentName: string) => {
+  switch (section.state) {
+    case 'in-review':
+      if (section.currentTurn === 'you') {
+        return { text: `${coParentName} submitted a draft for your review`, color: 'text-blue-600', accent: 'border-l-4 border-blue-500' };
+      }
+      return { text: `Your draft sent · Waiting on ${coParentName}`, color: 'text-gray-500', accent: '' };
+    case 'contested':
+      if (section.currentTurn === 'you') {
+        const editCount = section.editHistory?.length ?? 0;
+        return { text: `${coParentName} suggested changes · ${editCount} field${editCount !== 1 ? 's' : ''}`, color: 'text-amber-600', accent: 'border-l-4 border-amber-500' };
+      }
+      return { text: `Your changes sent · Waiting on ${coParentName}`, color: 'text-gray-500', accent: '' };
+    case 'draft':
+      if (section.draftedBy === 'you') {
+        return { text: 'Draft in progress', color: 'text-amber-600', accent: 'border-l-4 border-amber-500' };
+      }
+      return { text: `${coParentName} is drafting`, color: 'text-gray-500', accent: '' };
+    case 'agreed':
+      return { text: 'Both agreed', color: 'text-success', accent: 'border-l-4 border-success' };
+    default:
+      return null;
+  }
+};
+
+export default function ParentingPlanProgress({ sections, onSectionClick, previewMode = false, coParentName }: ParentingPlanProgressProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<SectionCategory>>(
     new Set(['timesharing', 'decision-making', 'communication', 'other'])
   );
@@ -37,7 +63,7 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
 
   // Calculate overall completion
   const totalSections = sections.length;
-  const completedSections = sections.filter(s => s.state === 'completed' || s.state === 'signed').length;
+  const completedSections = sections.filter(s => s.state === 'agreed' || s.state === 'signed').length;
 
   const handleSectionClick = (section: Section) => {
     if (onSectionClick) {
@@ -128,34 +154,46 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
                           )}
                         </div>
                       </div>
-                    ) : (
-                      <button
-                        key={section.id}
-                        onClick={() => handleSectionClick(section)}
-                        className="w-full px-4 py-3 hover:bg-gray-50 transition-colors flex items-center justify-between group"
-                      >
-                        <div className="flex items-center space-x-3 flex-1">
+                    ) : (() => {
+                      const asyncStatus = getAsyncStatusMessage(section, coParentName || 'Co-parent');
+                      const isActionable = (section.state === 'in-review' || section.state === 'contested') && section.currentTurn === 'you';
+                      return (
+                        <div
+                          key={section.id}
+                          className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 transition-colors ${asyncStatus?.accent || ''}`}
+                          onClick={() => onSectionClick?.(section)}
+                        >
                           <SectionStatusBadge status={section.state} size="sm" />
-                          <div className="text-left flex-1">
-                            <div className="font-medium text-gray-900 group-hover:text-primary transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <p className={`text-sm font-medium ${section.state === 'not-started' ? 'text-gray-500' : 'text-gray-900'}`}>
                               {section.title}
-                            </div>
-                            {section.state === 'not-started' && section.estimatedTime && (
-                              <div className="flex items-center space-x-1 text-xs text-gray-500 mt-0.5">
-                                <ClockIcon className="w-3 h-3" />
-                                <span>{section.estimatedTime}</span>
-                              </div>
-                            )}
-                            {section.state === 'completed' && (
-                              <div className="text-xs text-success mt-0.5">Ready to sign</div>
-                            )}
-                            {section.state === 'signed' && (
-                              <div className="text-xs text-success mt-0.5">Signed</div>
+                            </p>
+                            {asyncStatus && (
+                              <p className={`text-xs mt-0.5 ${asyncStatus.color}`}>
+                                {asyncStatus.text}
+                              </p>
                             )}
                           </div>
+                          {isActionable && (
+                            <button
+                              className="text-xs px-3 py-1.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors font-medium"
+                              onClick={(e) => { e.stopPropagation(); onSectionClick?.(section); }}
+                            >
+                              Review
+                            </button>
+                          )}
+                          {section.state === 'agreed' && (
+                            <span className="text-xs text-success font-medium">Ready to sign</span>
+                          )}
+                          {section.state === 'signed' && (
+                            <span className="text-xs text-success font-medium">Signed</span>
+                          )}
+                          {section.state === 'not-started' && section.estimatedTime && (
+                            <span className="text-xs text-gray-400">{section.estimatedTime}</span>
+                          )}
                         </div>
-                      </button>
-                    )
+                      );
+                    })()
                   ))}
                 </div>
               )}

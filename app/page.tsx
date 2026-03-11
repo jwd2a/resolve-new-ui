@@ -329,6 +329,7 @@ export default function Home() {
                 <ParentingPlanProgress
                   sections={mockSections}
                   onSectionClick={handleSectionClick}
+                  coParentName="Michael"
                   previewMode={showPreCourse && !(preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
                 />
               </div>
