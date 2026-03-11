@@ -9,10 +9,12 @@ import SessionPrompt from './components/SessionPrompt';
 import OnboardingChecklist, { OnboardingTask } from './components/OnboardingChecklist';
 import CourseOutline from './components/CourseOutline';
 import PreCourseRequirementsBanner, { PreCourseRequirementsState } from './components/PreCourseRequirementsBanner';
-import { Section } from './types/section';
+import { Section, SectionState } from './types/section';
 
 export default function Home() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [asyncViewSection, setAsyncViewSection] = useState<Section | null>(null);
+  const [showSignModal, setShowSignModal] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [showCoursePreview, setShowCoursePreview] = useState(false);
   const [showPreCourse, setShowPreCourse] = useState(false);
@@ -161,16 +163,16 @@ export default function Home() {
   const mockSections: Section[] = [
     // Timesharing
     { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '~20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
-    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'completed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
+    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'agreed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
     { id: 'weekday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekday Schedule', description: 'Define weekday schedule', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/weekday' },
-    { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'not-started', estimatedTime: '~20 min', formUrl: '/forms/breaks' },
-    { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'completed', estimatedTime: '~10 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
+    { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'in-review' as SectionState, estimatedTime: '~20 min', formUrl: '/forms/breaks', draftedBy: 'them' as const, currentTurn: 'you' as const, draftData: { springBreak: 'Alternating years', winterBreak: 'Split evenly — first half with one parent, second half with other', summerBreak: 'Each parent gets two consecutive weeks' } },
+    { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'agreed', estimatedTime: '~10 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
 
     // Decision-Making
     { id: 'shared-decisions', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Shared Decision-Making', description: 'Major decisions requiring both parents', state: 'signed', estimatedTime: '~15 min', formUrl: '/forms/shared-decisions', signatureStatus: { you: true, them: true } },
-    { id: 'day-to-day', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Day-to-Day Decisions', description: 'Routine daily decisions', state: 'completed', estimatedTime: '~10 min', formUrl: '/forms/daily', signatureStatus: { you: false, them: false } },
+    { id: 'day-to-day', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Day-to-Day Decisions', description: 'Routine daily decisions', state: 'agreed', estimatedTime: '~10 min', formUrl: '/forms/daily', signatureStatus: { you: false, them: false } },
     { id: 'extracurricular', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Extra-curricular Activities', description: 'Sports, clubs, and activities', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/activities' },
-    { id: 'healthcare', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Healthcare Decisions', description: 'Medical care and insurance', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/healthcare' },
+    { id: 'healthcare', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Healthcare Decisions', description: 'Medical care and insurance', state: 'contested' as SectionState, estimatedTime: '~15 min', formUrl: '/forms/healthcare', draftedBy: 'you' as const, currentTurn: 'you' as const, draftData: { primaryPhysician: 'Both parents must agree on primary physician', emergencyDecisions: 'Either parent can authorize emergency treatment', mentalHealth: 'Both parents must consent to ongoing therapy' }, editHistory: [ { fieldId: 'mentalHealth', previousValue: 'Primary custodial parent decides on therapy', newValue: 'Both parents must consent to ongoing therapy', editedBy: 'them' as const, editedAt: new Date('2026-03-09') } ] },
 
     // Communication
     { id: 'communication-methods', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Communication Protocols', description: 'How you\'ll communicate', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/communication' },
@@ -182,14 +184,21 @@ export default function Home() {
   ];
 
   const handleSectionClick = (section: Section) => {
-    if (section.state === 'not-started') {
-      alert('Start a session to work on this section together');
-    } else if (section.state === 'completed') {
-      alert('Open signing modal for: ' + section.title);
-      // TODO: Open QuickSignModal
-    } else if (section.state === 'signed') {
-      alert('View signed agreement for: ' + section.title);
-      // TODO: Open agreement preview
+    switch (section.state) {
+      case 'not-started':
+        console.log('Start section:', section.id);
+        break;
+      case 'draft':
+      case 'in-review':
+      case 'contested':
+        setAsyncViewSection(section);
+        break;
+      case 'agreed':
+        setShowSignModal(true);
+        break;
+      case 'signed':
+        setShowPreviewModal(true);
+        break;
     }
   };
 
