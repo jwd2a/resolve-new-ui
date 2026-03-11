@@ -1,4 +1,4 @@
-import { CheckCircleIcon, PencilIcon } from '@heroicons/react/24/solid';
+import { CheckIcon, PencilSquareIcon, PencilIcon, EyeIcon, ArrowUturnLeftIcon } from '@heroicons/react/24/solid';
 import { SectionState } from '../types/section';
 
 interface SectionStatusBadgeProps {
@@ -7,32 +7,44 @@ interface SectionStatusBadgeProps {
 }
 
 export default function SectionStatusBadge({ status, size = 'md' }: SectionStatusBadgeProps) {
-  const sizeClasses = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6';
-  const iconSizeClasses = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4';
+  const iconSize = size === 'sm' ? 'w-5 h-5' : 'w-6 h-6';
+  const innerSize = size === 'sm' ? 'w-3 h-3' : 'w-4 h-4';
 
-  if (status === 'not-started') {
-    return (
-      <div className={`${sizeClasses} rounded-full border-2 border-gray-300 bg-white flex items-center justify-center`}>
-        {/* Empty circle for not started */}
-      </div>
-    );
+  switch (status) {
+    case 'not-started':
+      return (
+        <div className={`${iconSize} rounded-full border-2 border-gray-300 bg-white flex items-center justify-center`}>
+        </div>
+      );
+    case 'draft':
+      return (
+        <div className={`${iconSize} rounded-full bg-amber-100 flex items-center justify-center`}>
+          <PencilIcon className={`${innerSize} text-amber-600`} />
+        </div>
+      );
+    case 'in-review':
+      return (
+        <div className={`${iconSize} rounded-full bg-blue-100 flex items-center justify-center`}>
+          <EyeIcon className={`${innerSize} text-blue-600`} />
+        </div>
+      );
+    case 'contested':
+      return (
+        <div className={`${iconSize} rounded-full bg-amber-100 flex items-center justify-center`}>
+          <ArrowUturnLeftIcon className={`${innerSize} text-amber-600`} />
+        </div>
+      );
+    case 'agreed':
+      return (
+        <div className={`${iconSize} rounded-full bg-success-light flex items-center justify-center`}>
+          <CheckIcon className={`${innerSize} text-success`} />
+        </div>
+      );
+    case 'signed':
+      return (
+        <div className={`${iconSize} rounded-full bg-success-light flex items-center justify-center`}>
+          <PencilSquareIcon className={`${innerSize} text-success`} />
+        </div>
+      );
   }
-
-  if (status === 'completed') {
-    return (
-      <div className={`${sizeClasses} rounded-full bg-success flex items-center justify-center`}>
-        <CheckCircleIcon className={`${iconSizeClasses} text-white`} />
-      </div>
-    );
-  }
-
-  if (status === 'signed') {
-    return (
-      <div className={`${sizeClasses} rounded-full bg-success flex items-center justify-center`}>
-        <PencilIcon className={`${iconSizeClasses} text-white`} />
-      </div>
-    );
-  }
-
-  return null;
 }
