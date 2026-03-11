@@ -1,4 +1,4 @@
-// Three-state model for session-based parenting plan
+// Section state model for parenting plan (supports sync and async completion)
 export type SectionState =
   | 'not-started'
   | 'draft'
