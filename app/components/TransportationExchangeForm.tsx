@@ -28,8 +28,8 @@ export default function TransportationExchangeForm() {
     // In real app, this would allow editing the form
   };
 
-  const handleApprove = (parent1Initials: string, parent2Initials: string) => {
-    console.log('Approved with initials:', parent1Initials, parent2Initials);
+  const handleApprove = (initials: string) => {
+    console.log('Approved with initials:', initials);
     // In real app, this would save approval and navigate to next section
   };
 
@@ -67,8 +67,8 @@ export default function TransportationExchangeForm() {
         onEditAndRegenerate={handleEditAndRegenerate}
         onApprove={handleApprove}
         onSkip={handleSkip}
-        parent1Name="Justin Davis"
-        parent2Name="Co-Parent"
+        parentName="Justin Davis"
+        coParentName="Co-Parent"
       />
     );
   }
