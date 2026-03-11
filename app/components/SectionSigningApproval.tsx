@@ -7,10 +7,11 @@ interface SectionSigningApprovalProps {
   sectionTitle: string;
   generatedText: string;
   onEditAndRegenerate: () => void;
-  onApprove: (parent1Initials: string, parent2Initials: string) => void;
+  onApprove: (initials: string) => void;
   onSkip: () => void;
-  parent1Name?: string;
-  parent2Name?: string;
+  parentName?: string;
+  coParentName?: string;
+  coParentSigned?: boolean;
 }
 
 export default function SectionSigningApproval({
@@ -19,19 +20,11 @@ export default function SectionSigningApproval({
   onEditAndRegenerate,
   onApprove,
   onSkip,
-  parent1Name = 'Parent 1',
-  parent2Name = 'Parent 2',
+  parentName,
+  coParentName,
+  coParentSigned,
 }: SectionSigningApprovalProps) {
-  const [parent1Initials, setParent1Initials] = useState('');
-  const [parent2Initials, setParent2Initials] = useState('');
-
-  const handleApprove = () => {
-    if (parent1Initials && parent2Initials) {
-      onApprove(parent1Initials, parent2Initials);
-    }
-  };
-
-  const canApprove = parent1Initials.trim() !== '' && parent2Initials.trim() !== '';
+  const [initials, setInitials] = useState('');
 
   return (
     <div className="space-y-6">
@@ -56,58 +49,48 @@ export default function SectionSigningApproval({
       {/* Approval Section */}
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Approval</h3>
-        <p className="text-sm text-gray-700 mb-6">
-          By entering your initials and clicking "Approve & Continue", you confirm that this text
-          accurately represents your understanding and agreement.
-        </p>
 
-        {/* Initial Boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Parent 1 Initials */}
-          <div>
-            <div className="bg-gray-50 rounded-lg border-2 border-gray-200 p-6 text-center">
+        {/* Approval section */}
+        <div className="mt-6">
+          <p className="text-sm text-gray-600 mb-4">
+            By entering your initials below, you confirm that you have reviewed and approve of this language.
+          </p>
+
+          <div className="flex items-center gap-6">
+            {/* Your initials */}
+            <div className="flex flex-col items-center">
+              <label className="text-xs text-gray-500 mb-1">{parentName || 'Your'} Initials</label>
               <input
                 type="text"
-                value={parent1Initials}
-                onChange={(e) => setParent1Initials(e.target.value.toUpperCase())}
-                maxLength={4}
-                placeholder="Initials"
-                className="w-full text-center text-4xl font-serif italic bg-transparent border-none focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-300"
+                value={initials}
+                onChange={(e) => setInitials(e.target.value.toUpperCase().slice(0, 4))}
+                className="w-20 h-12 text-center text-lg font-serif border-2 border-gray-300 rounded-lg focus:border-primary focus:ring-1 focus:ring-primary"
+                placeholder="___"
                 style={{ fontFamily: 'Georgia, serif' }}
               />
             </div>
-            <p className="text-sm text-gray-600 text-center mt-2">{parent1Name} Initials</p>
+
+            {/* Co-parent status */}
+            <div className="flex flex-col items-center">
+              <label className="text-xs text-gray-500 mb-1">{coParentName || 'Co-parent'}</label>
+              <div className={`w-20 h-12 flex items-center justify-center text-sm rounded-lg border-2 ${
+                coParentSigned
+                  ? 'border-success bg-green-50 text-success font-medium'
+                  : 'border-gray-200 bg-gray-50 text-gray-400'
+              }`}>
+                {coParentSigned ? 'Signed' : 'Pending'}
+              </div>
+            </div>
           </div>
 
-          {/* Parent 2 Initials */}
-          <div>
-            <div className="bg-gray-50 rounded-lg border-2 border-gray-200 p-6 text-center">
-              <input
-                type="text"
-                value={parent2Initials}
-                onChange={(e) => setParent2Initials(e.target.value.toUpperCase())}
-                maxLength={4}
-                placeholder="Initials"
-                className="w-full text-center text-4xl font-serif italic bg-transparent border-none focus:outline-none focus:ring-0 text-gray-900 placeholder-gray-300"
-                style={{ fontFamily: 'Georgia, serif' }}
-              />
-            </div>
-            <p className="text-sm text-gray-600 text-center mt-2">{parent2Name} Initials</p>
-          </div>
+          <button
+            onClick={() => onApprove(initials)}
+            disabled={!initials.trim()}
+            className="mt-4 w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Initialed & Approved
+          </button>
         </div>
-
-        {/* Approve Button */}
-        <button
-          onClick={handleApprove}
-          disabled={!canApprove}
-          className={`w-full px-6 py-3 rounded-lg font-semibold text-white transition-colors ${
-            canApprove
-              ? 'bg-primary hover:bg-primary/90'
-              : 'bg-gray-300 cursor-not-allowed'
-          }`}
-        >
-          Initialed & Approved
-        </button>
       </div>
 
       {/* Skip Link */}
