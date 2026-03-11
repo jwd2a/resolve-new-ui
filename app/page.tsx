@@ -10,6 +10,8 @@ import OnboardingChecklist, { OnboardingTask } from './components/OnboardingChec
 import CourseOutline from './components/CourseOutline';
 import PreCourseRequirementsBanner, { PreCourseRequirementsState } from './components/PreCourseRequirementsBanner';
 import { Section, SectionState } from './types/section';
+import AsyncSectionView from '@/app/components/AsyncSectionView';
+import QuickSignModal from '@/app/components/QuickSignModal';
 
 export default function Home() {
   const [showPreviewModal, setShowPreviewModal] = useState(false);
@@ -367,6 +369,49 @@ export default function Home() {
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
       />
+
+      {asyncViewSection && (
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="py-8 px-4">
+            <AsyncSectionView
+              section={asyncViewSection}
+              coParentName="Michael"
+              onSave={(data) => {
+                console.log('Saved draft:', data);
+                setAsyncViewSection(null);
+              }}
+              onSubmitForReview={(data) => {
+                console.log('Submitted for review:', data);
+                setAsyncViewSection(null);
+              }}
+              onAccept={() => {
+                console.log('Accepted');
+                setAsyncViewSection(null);
+              }}
+              onSubmitChanges={(data, edits) => {
+                console.log('Submitted changes:', data, edits);
+                setAsyncViewSection(null);
+              }}
+              onStartSession={() => {
+                setAsyncViewSection(null);
+              }}
+              onClose={() => setAsyncViewSection(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showSignModal && (
+        <QuickSignModal
+          sections={mockSections.filter(s => s.state === 'agreed' && !s.signatureStatus?.you)}
+          coParentName="Michael"
+          onClose={() => setShowSignModal(false)}
+          onSign={(sectionIds, signature) => {
+            console.log('Signed sections:', sectionIds, 'with signature:', signature);
+            setShowSignModal(false);
+          }}
+        />
+      )}
     </div>
   );
 }
