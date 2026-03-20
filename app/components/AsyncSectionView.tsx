@@ -8,8 +8,10 @@ import InlineDiffField from './InlineDiffField';
 interface AsyncSectionViewProps {
   section: Section;
   coParentName: string;
+  isProposed?: boolean;
   onSave?: (data: Record<string, string>) => void;
   onSubmitForReview?: (data: Record<string, string>) => void;
+  onComplete?: (data: Record<string, string>) => void;
   onAccept?: () => void;
   onSubmitChanges?: (data: Record<string, string>, edits: EditEntry[]) => void;
   onStartSession?: () => void;
@@ -19,8 +21,10 @@ interface AsyncSectionViewProps {
 export default function AsyncSectionView({
   section,
   coParentName,
+  isProposed,
   onSave,
   onSubmitForReview,
+  onComplete,
   onAccept,
   onSubmitChanges,
   onStartSession,
@@ -41,6 +45,7 @@ export default function AsyncSectionView({
 
   // Determine the async mode — this view should only be opened when it's the user's turn
   const bannerState = (() => {
+    if (isProposed) return 'proposed' as const;
     if (section.state === 'in-review') return 'reviewing' as const;
     if (section.state === 'contested') return 'contested' as const;
     return 'drafting' as const;
@@ -48,7 +53,7 @@ export default function AsyncSectionView({
 
   const isReviewing = section.state === 'in-review';
   const isContested = section.state === 'contested';
-  const isDrafting = section.state === 'draft' || section.state === 'not-started';
+  const isDrafting = section.state === 'draft' || section.state === 'not-started' || section.state === 'completed-draft';
 
   const formFields = Object.keys(formData);
 
@@ -91,7 +96,7 @@ export default function AsyncSectionView({
           coParentName={coParentName}
           state={bannerState}
           editCount={section.editHistory?.length}
-          onStartSession={onStartSession}
+          onStartSession={isProposed ? undefined : onStartSession}
         />
       </div>
 
@@ -126,12 +131,21 @@ export default function AsyncSectionView({
             >
               Save & Continue Later
             </button>
-            <button
-              onClick={() => onSubmitForReview?.(formData)}
-              className="px-5 py-2 text-sm font-semibold text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-colors"
-            >
-              Submit for Review
-            </button>
+            {isProposed ? (
+              <button
+                onClick={() => onComplete?.(formData)}
+                className="px-5 py-2 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
+              >
+                {section.state === 'completed-draft' ? 'Update' : 'Complete'}
+              </button>
+            ) : (
+              <button
+                onClick={() => onSubmitForReview?.(formData)}
+                className="px-5 py-2 text-sm font-semibold text-white bg-amber-500 rounded-lg hover:bg-amber-600 transition-colors"
+              >
+                Submit for Review
+              </button>
+            )}
           </>
         )}
 
