@@ -116,6 +116,18 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
         )}
       </div>
 
+      {/* Proposed Mode Banner */}
+      {isProposed && !previewMode && (
+        <div className="mb-6 py-3 px-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <p className="text-center text-sm font-semibold text-purple-800 tracking-wide uppercase">
+            Proposed Draft Mode
+          </p>
+          <p className="text-center text-xs text-purple-600 mt-1">
+            You are completing this plan without your co-parent. Signatures will not be collected.
+          </p>
+        </div>
+      )}
+
       {/* Category Sections */}
       <div className="space-y-4">
         {categories.map((category) => {
