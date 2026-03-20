@@ -12,16 +12,19 @@ import PreCourseRequirementsBanner, { PreCourseRequirementsState } from './compo
 import { Section, SectionState } from './types/section';
 import AsyncSectionView from '@/app/components/AsyncSectionView';
 import QuickSignModal from '@/app/components/QuickSignModal';
+import SoloModeConfirmModal from './components/SoloModeConfirmModal';
 import { usePlan } from '@/app/PlanContext';
 
 export default function Home() {
-  const { isProposed } = usePlan();
+  const { isProposed, setIsProposed } = usePlan();
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [asyncViewSection, setAsyncViewSection] = useState<Section | null>(null);
   const [showSignModal, setShowSignModal] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [showCoursePreview, setShowCoursePreview] = useState(false);
   const [showPreCourse, setShowPreCourse] = useState(false);
+  const [showSoloModeModal, setShowSoloModeModal] = useState(false);
+  const [soloModalDirection, setSoloModalDirection] = useState<'enable' | 'disable'>('enable');
   const [preCourseState, setPreCourseState] = useState<PreCourseRequirementsState>({
     inviteStatus: 'accepted',
     waiverStatus: { you: false, them: false },
@@ -221,6 +224,11 @@ export default function Home() {
     // TODO: Create session with type 'remote'
   };
 
+  const handleOpenSoloModal = (direction: 'enable' | 'disable') => {
+    setSoloModalDirection(direction);
+    setShowSoloModeModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -333,9 +341,12 @@ export default function Home() {
                     Proposed Plan Mode — You are completing this plan without your co-parent
                   </p>
                 </div>
-                <a href="/family-info" className="text-sm text-purple-600 hover:text-purple-800 underline">
+                <button
+                  onClick={() => handleOpenSoloModal('disable')}
+                  className="text-sm text-purple-600 hover:text-purple-800 underline"
+                >
                   Change
-                </a>
+                </button>
               </div>
             )}
 
@@ -343,15 +354,33 @@ export default function Home() {
               {/* Left Column - Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Session Prompt */}
-                {!isProposed && (
+                {isProposed ? (
                   <SessionPrompt
                     coParentName={userData.coParentName}
-                    coParentOnline={userData.coParentOnline}
-                    lastSessionDate={new Date('2026-01-01')}
-                    onStartInPerson={handleStartInPerson}
-                    onStartRemote={handleStartRemote}
-                    canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
+                    coParentOnline={false}
+                    isSoloMode
+                    onStartSession={() => alert('Starting solo session...')}
                   />
+                ) : (
+                  <>
+                    <SessionPrompt
+                      coParentName={userData.coParentName}
+                      coParentOnline={userData.coParentOnline}
+                      lastSessionDate={new Date('2026-01-01')}
+                      onStartInPerson={handleStartInPerson}
+                      onStartRemote={handleStartRemote}
+                      canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
+                    />
+                    {/* Solo mode entry point */}
+                    <div className="text-center">
+                      <button
+                        onClick={() => handleOpenSoloModal('enable')}
+                        className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors"
+                      >
+                        Co-parent unable to participate? Switch to solo mode
+                      </button>
+                    </div>
+                  </>
                 )}
 
                 {/* Parenting Plan Progress - THE MAIN COMPONENT */}
@@ -444,6 +473,14 @@ export default function Home() {
           }}
         />
       )}
+
+      <SoloModeConfirmModal
+        isOpen={showSoloModeModal}
+        onClose={() => setShowSoloModeModal(false)}
+        onConfirm={() => setIsProposed(soloModalDirection === 'enable')}
+        direction={soloModalDirection}
+        coParentName={userData.coParentName}
+      />
     </div>
   );
 }
