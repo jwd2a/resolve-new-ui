@@ -4,7 +4,7 @@ import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 interface AsyncDraftBannerProps {
   coParentName: string;
-  state: 'drafting' | 'reviewing' | 'contested';
+  state: 'drafting' | 'reviewing' | 'contested' | 'proposed';
   editCount?: number;
   onStartSession?: () => void;
 }
@@ -31,6 +31,13 @@ export default function AsyncDraftBanner({ coParentName, state, editCount, onSta
       iconColor: 'text-amber-500',
       title: `${coParentName} suggested changes to ${editCount ?? 0} field${editCount !== 1 ? 's' : ''}`,
       subtitle: 'Review the changes. Accept to agree, or edit further.',
+    },
+    proposed: {
+      bg: 'bg-purple-50',
+      border: 'border-purple-200',
+      iconColor: 'text-purple-500',
+      title: "You're completing this as a proposed plan",
+      subtitle: 'Your answers will be saved. No co-parent review is required.',
     },
   };
 
