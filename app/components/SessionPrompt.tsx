@@ -9,6 +9,8 @@ interface SessionPromptProps {
   onStartInPerson?: () => void;
   onStartRemote?: () => void;
   canStartCourse?: boolean;
+  isSoloMode?: boolean;
+  onStartSession?: () => void;
 }
 
 export default function SessionPrompt({
@@ -18,7 +20,31 @@ export default function SessionPrompt({
   onStartInPerson,
   onStartRemote,
   canStartCourse = true,
+  isSoloMode = false,
+  onStartSession,
 }: SessionPromptProps) {
+  if (isSoloMode) {
+    return (
+      <div className="bg-white border border-gray-200 rounded-xl p-6">
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">
+            Continue Your Plan
+          </h3>
+          <p className="text-sm text-gray-600">
+            Pick up where you left off on your proposed parenting plan.
+          </p>
+        </div>
+
+        <button
+          onClick={onStartSession}
+          className="w-full px-6 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary/90 transition-colors"
+        >
+          Start Session
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6">
       {/* Section Title */}
