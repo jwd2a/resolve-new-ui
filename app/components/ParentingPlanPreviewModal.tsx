@@ -20,6 +20,7 @@ interface ParentingPlanPreviewModalProps {
   isOpen: boolean;
   onClose: () => void;
   currentSectionId?: string;
+  isProposed?: boolean;
 }
 
 const navigationSections: NavigationSection[] = [
@@ -80,6 +81,7 @@ export default function ParentingPlanPreviewModal({
   isOpen,
   onClose,
   currentSectionId = 'weekday-weekend',
+  isProposed,
 }: ParentingPlanPreviewModalProps) {
   const [activeSection, setActiveSection] = useState(currentSectionId);
   const [isVisible, setIsVisible] = useState(false);
@@ -116,7 +118,9 @@ export default function ParentingPlanPreviewModal({
       }`}>
         {/* Header */}
         <div className="bg-primary px-6 py-4 flex items-center justify-between border-b border-primary-dark">
-          <h2 className="text-xl font-bold text-white">Parenting Plan Preview</h2>
+          <h2 className="text-xl font-bold text-white">
+            {isProposed ? 'Proposed Parenting Plan' : 'Parenting Plan Preview'}
+          </h2>
           <button
             onClick={onClose}
             className="w-8 h-8 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
@@ -169,6 +173,14 @@ export default function ParentingPlanPreviewModal({
           {/* Main Content Area */}
           <div className="flex-1 overflow-y-auto bg-white">
             <div className="p-8 max-w-3xl">
+              {isProposed && (
+                <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <p className="text-sm text-amber-800">
+                    This parenting plan was prepared by one parent after the other parent
+                    declined or was unable to participate in the collaborative process.
+                  </p>
+                </div>
+              )}
               {/* Current Section Indicator */}
               {currentNavSection?.current && (
                 <div className="flex items-center space-x-2 mb-6 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2 inline-flex">
