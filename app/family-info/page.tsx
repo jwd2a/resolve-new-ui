@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { usePlan } from '@/app/PlanContext';
 import {
   UserIcon,
   PhoneIcon,
@@ -38,6 +39,7 @@ interface Jurisdiction {
 
 export default function FamilyInfoPage() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const { isProposed, setIsProposed } = usePlan();
 
   // Mock data
   const parents: Parent[] = [
@@ -212,6 +214,27 @@ export default function FamilyInfoPage() {
                   </div>
                 </div>
               ))}
+            </div>
+            {/* Proposed mode toggle */}
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <label className="flex items-start space-x-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={isProposed}
+                  onChange={(e) => setIsProposed(e.target.checked)}
+                  className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/50"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-900">
+                    Complete this plan without my co-parent
+                  </span>
+                  {isProposed && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Your plan will be marked as a Proposed Parenting Plan. Signatures will not be collected.
+                    </p>
+                  )}
+                </div>
+              </label>
             </div>
           </SectionCard>
 
