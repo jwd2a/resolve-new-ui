@@ -37,6 +37,8 @@ const getAsyncStatusMessage = (section: Section, coParentName: string) => {
         return { text: 'Draft in progress', color: 'text-amber-600', accent: 'border-l-4 border-amber-500' };
       }
       return { text: `${coParentName} is drafting`, color: 'text-gray-500', accent: '' };
+    case 'completed-draft':
+      return { text: 'Completed', color: 'text-green-600', accent: 'border-l-4 border-green-400' };
     case 'agreed':
       return { text: 'Both agreed', color: 'text-success', accent: 'border-l-4 border-success' };
     default:

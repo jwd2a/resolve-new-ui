@@ -22,6 +22,12 @@ export default function SectionStatusBadge({ status, size = 'md' }: SectionStatu
           <PencilIcon className={`${innerSize} text-amber-600`} />
         </div>
       );
+    case 'completed-draft':
+      return (
+        <div className={`${iconSize} rounded-full bg-success-light flex items-center justify-center`}>
+          <CheckIcon className={`${innerSize} text-success`} />
+        </div>
+      );
     case 'in-review':
       return (
         <div className={`${iconSize} rounded-full bg-blue-100 flex items-center justify-center`}>

@@ -2,6 +2,7 @@
 export type SectionState =
   | 'not-started'
   | 'draft'
+  | 'completed-draft'
   | 'in-review'
   | 'contested'
   | 'agreed'
@@ -75,7 +76,9 @@ export function getCategoryCompletion(sections: Section[], category: SectionCate
   const categorySections = sections.filter(s => s.category === category);
   return {
     total: categorySections.length,
-    completed: categorySections.filter(s => s.state === 'agreed' || s.state === 'signed').length,
+    completed: categorySections.filter(s =>
+      s.state === 'agreed' || s.state === 'signed' || s.state === 'completed-draft'
+    ).length,
     signed: categorySections.filter(s => s.state === 'signed').length,
   };
 }

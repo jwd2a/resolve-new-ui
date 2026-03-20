@@ -191,6 +191,7 @@ export default function Home() {
         console.log('Start section:', section.id);
         break;
       case 'draft':
+      case 'completed-draft':
       case 'in-review':
       case 'contested':
         setAsyncViewSection(section);
