@@ -3,12 +3,10 @@
 import { useRouter } from 'next/navigation';
 import { useOnboarding } from '../OnboardingContext';
 import { InformationCircleIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
-import { usePlan } from '@/app/PlanContext';
 
 export default function CoParentPage() {
   const router = useRouter();
   const { data, updateData, markStepComplete } = useOnboarding();
-  const { isProposed, setIsProposed } = usePlan();
 
   const handleContinue = () => {
     markStepComplete(2);
@@ -29,26 +27,6 @@ export default function CoParentPage() {
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-1">Co-Parent Information</h1>
       <p className="text-gray-500 mb-8">Add your co-parent&apos;s details. They&apos;ll need to register as well.</p>
-
-      {/* Solo mode toggle */}
-      <div className="mb-8 p-4 bg-gray-50 border border-gray-200 rounded-xl">
-        <label className="flex items-start space-x-3 cursor-pointer">
-          <input
-            type="checkbox"
-            checked={isProposed}
-            onChange={(e) => setIsProposed(e.target.checked)}
-            className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/50"
-          />
-          <div>
-            <span className="text-sm font-medium text-gray-900">
-              My co-parent will not be completing this with me
-            </span>
-            <p className="text-xs text-gray-500 mt-1">
-              You&apos;ll create a proposed parenting plan on your own. Your co-parent or a lawyer can review it later.
-            </p>
-          </div>
-        </label>
-      </div>
 
       {/* Co-Parent Legal Name */}
       <div className="mb-6">
@@ -107,7 +85,6 @@ export default function CoParentPage() {
       </div>
 
       {/* Co-Parent Phone */}
-      {!isProposed && (
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Co-Parent Phone Number</label>
         <input
@@ -118,10 +95,8 @@ export default function CoParentPage() {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
         />
       </div>
-      )}
 
       {/* Co-Parent Email */}
-      {!isProposed && (
       <div className="mb-6">
         <label className="block text-sm font-medium text-gray-700 mb-2">Co-Parent Email</label>
         <input
@@ -132,10 +107,8 @@ export default function CoParentPage() {
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
         />
       </div>
-      )}
 
       {/* Invite Section */}
-      {!isProposed && (
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-8">
         <div className="flex items-start space-x-3">
           <InformationCircleIcon className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -160,7 +133,6 @@ export default function CoParentPage() {
           </div>
         </div>
       </div>
-      )}
 
       {/* Footer */}
       <div className="flex justify-between">
