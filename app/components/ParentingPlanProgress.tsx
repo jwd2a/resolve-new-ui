@@ -20,7 +20,17 @@ const categoryLabels: Record<SectionCategory, string> = {
   'other': 'Final Considerations',
 };
 
-const getAsyncStatusMessage = (section: Section, coParentName: string) => {
+const getAsyncStatusMessage = (section: Section, coParentName: string, isProposed?: boolean) => {
+  if (isProposed) {
+    switch (section.state) {
+      case 'draft':
+        return { text: 'Draft in progress', color: 'text-amber-600', accent: 'border-l-4 border-amber-500' };
+      case 'completed-draft':
+        return { text: 'Completed', color: 'text-green-600', accent: 'border-l-4 border-green-400' };
+      default:
+        return null;
+    }
+  }
   switch (section.state) {
     case 'in-review':
       if (section.currentTurn === 'you') {
@@ -160,7 +170,7 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
                         </div>
                       </div>
                     ) : (() => {
-                      const asyncStatus = getAsyncStatusMessage(section, coParentName || 'Co-parent');
+                      const asyncStatus = getAsyncStatusMessage(section, coParentName || 'Co-parent', isProposed);
                       const isActionable = (section.state === 'in-review' || section.state === 'contested') && section.currentTurn === 'you';
                       return (
                         <div
