@@ -10,6 +10,7 @@ interface ParentingPlanProgressProps {
   onSectionClick?: (section: Section) => void;
   previewMode?: boolean;
   coParentName?: string;
+  isProposed?: boolean;
 }
 
 const categoryLabels: Record<SectionCategory, string> = {
@@ -46,7 +47,7 @@ const getAsyncStatusMessage = (section: Section, coParentName: string) => {
   }
 };
 
-export default function ParentingPlanProgress({ sections, onSectionClick, previewMode = false, coParentName }: ParentingPlanProgressProps) {
+export default function ParentingPlanProgress({ sections, onSectionClick, previewMode = false, coParentName, isProposed }: ParentingPlanProgressProps) {
   const [expandedCategories, setExpandedCategories] = useState<Set<SectionCategory>>(
     new Set(['timesharing', 'decision-making', 'communication', 'other'])
   );
@@ -65,7 +66,9 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
 
   // Calculate overall completion
   const totalSections = sections.length;
-  const completedSections = sections.filter(s => s.state === 'agreed' || s.state === 'signed').length;
+  const completedSections = sections.filter(s =>
+    s.state === 'agreed' || s.state === 'signed' || s.state === 'completed-draft'
+  ).length;
 
   const handleSectionClick = (section: Section) => {
     if (onSectionClick) {
@@ -184,10 +187,10 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
                               Review
                             </button>
                           )}
-                          {section.state === 'agreed' && (
+                          {!isProposed && section.state === 'agreed' && (
                             <span className="text-xs text-success font-medium">Ready to sign</span>
                           )}
-                          {section.state === 'signed' && (
+                          {!isProposed && section.state === 'signed' && (
                             <span className="text-xs text-success font-medium">Signed</span>
                           )}
                           {section.state === 'not-started' && section.estimatedTime && (
@@ -215,7 +218,9 @@ export default function ParentingPlanProgress({ sections, onSectionClick, previe
       {completedSections === totalSections && totalSections > 0 && (
         <div className="mt-6 p-4 bg-success/10 border-2 border-success rounded-lg text-center">
           <p className="text-success font-semibold">
-            🎉 All sections complete! Ready to sign your parenting plan.
+            {isProposed
+              ? 'All sections complete! Your proposed parenting plan is ready for review.'
+              : '🎉 All sections complete! Ready to sign your parenting plan.'}
           </p>
         </div>
       )}
