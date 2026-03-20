@@ -12,8 +12,10 @@ import PreCourseRequirementsBanner, { PreCourseRequirementsState } from './compo
 import { Section, SectionState } from './types/section';
 import AsyncSectionView from '@/app/components/AsyncSectionView';
 import QuickSignModal from '@/app/components/QuickSignModal';
+import { usePlan } from '@/app/PlanContext';
 
 export default function Home() {
+  const { isProposed } = usePlan();
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [asyncViewSection, setAsyncViewSection] = useState<Section | null>(null);
   const [showSignModal, setShowSignModal] = useState(false);
@@ -197,7 +199,11 @@ export default function Home() {
         setAsyncViewSection(section);
         break;
       case 'agreed':
-        setShowSignModal(true);
+        if (isProposed) {
+          setShowPreviewModal(true);
+        } else {
+          setShowSignModal(true);
+        }
         break;
       case 'signed':
         setShowPreviewModal(true);
@@ -254,7 +260,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {!isOnboarding && userData.coParentOnline && (
+              {!isOnboarding && !isProposed && userData.coParentOnline && (
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-sm text-gray-700">{userData.coParentName} is online</span>
@@ -298,7 +304,11 @@ export default function Home() {
             <div className="flex items-start justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {userData.name}</h1>
-                <p className="text-gray-600">Collaborate with your co-parent to complete your parenting plan.</p>
+                <p className="text-gray-600">
+                  {isProposed
+                    ? 'Complete your proposed parenting plan.'
+                    : 'Collaborate with your co-parent to complete your parenting plan.'}
+                </p>
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-600 mb-1">Target completion</div>
@@ -315,18 +325,34 @@ export default function Home() {
               </div>
             </div>
 
+            {isProposed && (
+              <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                  <p className="text-sm text-purple-800 font-medium">
+                    Proposed Plan Mode — You are completing this plan without your co-parent
+                  </p>
+                </div>
+                <a href="/family-info" className="text-sm text-purple-600 hover:text-purple-800 underline">
+                  Change
+                </a>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Session Prompt */}
-                <SessionPrompt
-                  coParentName={userData.coParentName}
-                  coParentOnline={userData.coParentOnline}
-                  lastSessionDate={new Date('2026-01-01')}
-                  onStartInPerson={handleStartInPerson}
-                  onStartRemote={handleStartRemote}
-                  canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
-                />
+                {!isProposed && (
+                  <SessionPrompt
+                    coParentName={userData.coParentName}
+                    coParentOnline={userData.coParentOnline}
+                    lastSessionDate={new Date('2026-01-01')}
+                    onStartInPerson={handleStartInPerson}
+                    onStartRemote={handleStartRemote}
+                    canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
+                  />
+                )}
 
                 {/* Parenting Plan Progress - THE MAIN COMPONENT */}
                 <ParentingPlanProgress
@@ -334,6 +360,7 @@ export default function Home() {
                   onSectionClick={handleSectionClick}
                   coParentName="Michael"
                   previewMode={showPreCourse && !(preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
+                  isProposed={isProposed}
                 />
               </div>
 
@@ -369,6 +396,7 @@ export default function Home() {
       <ParentingPlanPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
+        isProposed={isProposed}
       />
 
       {asyncViewSection && (
@@ -377,6 +405,7 @@ export default function Home() {
             <AsyncSectionView
               section={asyncViewSection}
               coParentName="Michael"
+              isProposed={isProposed}
               onSave={(data) => {
                 console.log('Saved draft:', data);
                 setAsyncViewSection(null);
@@ -393,16 +422,18 @@ export default function Home() {
                 console.log('Submitted changes:', data, edits);
                 setAsyncViewSection(null);
               }}
-              onStartSession={() => {
+              onComplete={(data) => {
+                console.log('Completed proposed section:', data);
                 setAsyncViewSection(null);
               }}
+              onStartSession={isProposed ? undefined : () => { setAsyncViewSection(null); }}
               onClose={() => setAsyncViewSection(null)}
             />
           </div>
         </div>
       )}
 
-      {showSignModal && (
+      {showSignModal && !isProposed && (
         <QuickSignModal
           sections={mockSections.filter(s => s.state === 'agreed' && !s.signatureStatus?.you)}
           coParentName="Michael"
