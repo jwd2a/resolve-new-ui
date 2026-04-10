@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
 import { HOLIDAY_CATEGORIES, ALL_PRESET_HOLIDAYS, getCategoryForHoliday } from './holidayData';
 
 type ScheduleType = 'normal' | 'alternating' | 'split' | 'justin' | 'michael';
@@ -40,6 +40,7 @@ export default function SelectHolidaysModal({
   const [selectedHolidayNames, setSelectedHolidayNames] = useState<string[]>([]);
   const [customHolidays, setCustomHolidays] = useState<string[]>([]);
   const [customHolidayInput, setCustomHolidayInput] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -47,8 +48,17 @@ export default function SelectHolidaysModal({
       setSelectedHolidayNames([]);
       setCustomHolidays([]);
       setCustomHolidayInput('');
+      setExpandedCategories([]);
     }
   }, [isOpen]);
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
 
   if (!isOpen) return null;
 
@@ -160,33 +170,58 @@ export default function SelectHolidaysModal({
                     selectedHolidayNames.includes(name)
                   );
 
+                  const isExpanded = expandedCategories.includes(cat.category);
+                  const selectedCount = availableHolidays.filter(name =>
+                    selectedHolidayNames.includes(name)
+                  ).length;
+
                   return (
-                    <div key={cat.category}>
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{cat.category}</h4>
-                        <button
-                          onClick={() => selectAllInCategory(cat.holidays)}
-                          className="text-xs text-primary hover:text-primary-dark transition-colors"
-                        >
-                          {allSelected ? 'All Selected' : 'Select All'}
-                        </button>
-                      </div>
-                      <div className="space-y-2">
-                        {availableHolidays.map((name) => (
-                          <label
-                            key={name}
-                            className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={selectedHolidayNames.includes(name)}
-                              onChange={() => toggleHolidaySelection(name)}
-                              className="w-4 h-4 text-primary focus:ring-primary rounded"
-                            />
-                            <span className="ml-3 text-sm text-gray-900">{name}</span>
-                          </label>
-                        ))}
-                      </div>
+                    <div key={cat.category} className="border border-gray-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => toggleCategory(cat.category)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          {isExpanded ? (
+                            <ChevronUpIcon className="w-4 h-4 text-gray-400" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+                          )}
+                          <h4 className="text-sm font-semibold text-gray-700">{cat.category}</h4>
+                          {selectedCount > 0 && (
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                              {selectedCount} selected
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400">{availableHolidays.length} holidays</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 py-3 space-y-2">
+                          <div className="flex justify-end mb-1">
+                            <button
+                              onClick={() => selectAllInCategory(cat.holidays)}
+                              className="text-xs text-primary hover:text-primary-dark transition-colors"
+                            >
+                              {allSelected ? 'All Selected' : 'Select All'}
+                            </button>
+                          </div>
+                          {availableHolidays.map((name) => (
+                            <label
+                              key={name}
+                              className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedHolidayNames.includes(name)}
+                                onChange={() => toggleHolidaySelection(name)}
+                                className="w-4 h-4 text-primary focus:ring-primary rounded"
+                              />
+                              <span className="ml-3 text-sm text-gray-900">{name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
                 })}
