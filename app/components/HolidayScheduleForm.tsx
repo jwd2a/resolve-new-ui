@@ -5,6 +5,7 @@ import { PlusIcon, Cog6ToothIcon, TrashIcon, ChevronRightIcon } from '@heroicons
 import HolidayConfigModal from './HolidayConfigModal';
 import AddHolidayModal from './AddHolidayModal';
 import SelectHolidaysModal from './SelectHolidaysModal';
+import { HOLIDAY_CATEGORIES, ALL_PRESET_HOLIDAYS, getCategoryForHoliday } from './holidayData';
 
 type ScheduleType = 'normal' | 'alternating' | 'split' | 'justin' | 'michael';
 type TimingType = 'mutual' | 'specify';
@@ -23,23 +24,8 @@ interface Holiday {
   id: string;
   name: string;
   config: HolidayConfig;
+  category?: string;
 }
-
-const COMMON_HOLIDAYS = [
-  "New Year's Day",
-  "Martin Luther King Jr. Day",
-  "Presidents' Day",
-  "Memorial Day",
-  "Juneteenth",
-  "Independence Day",
-  "Labor Day",
-  "Columbus Day / Indigenous Peoples' Day",
-  "Veterans Day",
-  "Thanksgiving",
-  "Christmas Eve",
-  "Christmas Day",
-  "New Year's Eve",
-];
 
 interface HolidayScheduleFormProps {
   flowType?: string;
@@ -75,6 +61,7 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
           alternatingOddYearParent: 'justin',
           timingType: 'mutual',
         },
+        category: getCategoryForHoliday(name),
       };
       setHolidays([...holidays, newHoliday]);
     }
@@ -93,6 +80,7 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
           alternatingOddYearParent: 'justin',
           timingType: 'mutual',
         },
+        category: getCategoryForHoliday(customName),
       };
       setHolidays([...holidays, newHoliday]);
       setCustomHolidayInput('');
@@ -164,6 +152,15 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
     );
   };
 
+  const selectAllInCategory = (holidays: string[]) => {
+    const allSelected = holidays.every(name => selectedHolidayNames.includes(name));
+    if (allSelected) {
+      setSelectedHolidayNames(prev => prev.filter(name => !holidays.includes(name)));
+    } else {
+      setSelectedHolidayNames(prev => [...new Set([...prev, ...holidays])]);
+    }
+  };
+
   const addCustomHolidayToSelection = () => {
     if (customHolidayInput.trim() && !customHolidays.includes(customHolidayInput.trim())) {
       setCustomHolidays([...customHolidays, customHolidayInput.trim()]);
@@ -187,6 +184,7 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
         alternatingOddYearParent: 'justin',
         timingType: 'mutual',
       },
+      category: getCategoryForHoliday(name),
     }));
     setHolidays(newHolidays);
     setStep('configuration');
@@ -234,7 +232,7 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
             </div>
           )}
 
-          {/* Selected Holidays List */}
+          {/* Selected Holidays List - Grouped by Category */}
           {holidays.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-4">
@@ -247,38 +245,56 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
                   <span>Add More</span>
                 </button>
               </div>
-              <div className="space-y-3">
-                {holidays.map((holiday) => (
-                  <div
-                    key={holiday.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
-                  >
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3">
-                        <span className="font-medium text-gray-900">{holiday.name}</span>
-                        <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getBadgeColor(holiday.config)}`}>
-                          {getBadgeText(holiday.config)}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => openConfigModal(holiday)}
-                        className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
-                      >
-                        <Cog6ToothIcon className="w-4 h-4" />
-                        <span>Configure</span>
-                      </button>
-                      <button
-                        onClick={() => removeHoliday(holiday.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
+              {(() => {
+                const categoryOrder = HOLIDAY_CATEGORIES.map(c => c.category);
+                const groups: Record<string, Holiday[]> = {};
+                holidays.forEach(h => {
+                  const key = h.category || 'Custom';
+                  if (!groups[key]) groups[key] = [];
+                  groups[key].push(h);
+                });
+                const orderedKeys = [
+                  ...categoryOrder.filter(k => groups[k]),
+                  ...(groups['Custom'] ? ['Custom'] : []),
+                ];
+                return orderedKeys.map(catName => (
+                  <div key={catName}>
+                    <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider mt-4 mb-2 first:mt-0">{catName}</h4>
+                    <div className="space-y-3">
+                      {groups[catName].map((holiday) => (
+                        <div
+                          key={holiday.id}
+                          className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors"
+                        >
+                          <div className="flex-1">
+                            <div className="flex items-center space-x-3">
+                              <span className="font-medium text-gray-900">{holiday.name}</span>
+                              <span className={`px-2.5 py-1 text-xs font-medium rounded-full ${getBadgeColor(holiday.config)}`}>
+                                {getBadgeText(holiday.config)}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={() => openConfigModal(holiday)}
+                              className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                            >
+                              <Cog6ToothIcon className="w-4 h-4" />
+                              <span>Configure</span>
+                            </button>
+                            <button
+                              onClick={() => removeHoliday(holiday.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <TrashIcon className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
+                ));
+              })()}
             </div>
           )}
         </div>
@@ -337,25 +353,41 @@ export default function HolidayScheduleForm({ flowType = 'inline' }: HolidaySche
 
         {/* Content */}
         <div className="p-6">
-          {/* Common Holidays */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-3">Common Holidays</h3>
-            <div className="space-y-2">
-              {COMMON_HOLIDAYS.map((name) => (
-                <label
-                  key={name}
-                  className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedHolidayNames.includes(name)}
-                    onChange={() => toggleHolidaySelection(name)}
-                    className="w-4 h-4 text-primary focus:ring-primary rounded"
-                  />
-                  <span className="ml-3 text-sm text-gray-900">{name}</span>
-                </label>
-              ))}
-            </div>
+          {/* Categorized Holidays */}
+          <div className="space-y-6 mb-6">
+            {HOLIDAY_CATEGORIES.map((cat) => {
+              const allSelected = cat.holidays.every(name => selectedHolidayNames.includes(name));
+
+              return (
+                <div key={cat.category}>
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">{cat.category}</h4>
+                    <button
+                      onClick={() => selectAllInCategory(cat.holidays)}
+                      className="text-xs text-primary hover:text-primary-dark transition-colors"
+                    >
+                      {allSelected ? 'All Selected' : 'Select All'}
+                    </button>
+                  </div>
+                  <div className="space-y-2">
+                    {cat.holidays.map((name) => (
+                      <label
+                        key={name}
+                        className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={selectedHolidayNames.includes(name)}
+                          onChange={() => toggleHolidaySelection(name)}
+                          className="w-4 h-4 text-primary focus:ring-primary rounded"
+                        />
+                        <span className="ml-3 text-sm text-gray-900">{name}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
 
           {/* Custom Holidays */}
