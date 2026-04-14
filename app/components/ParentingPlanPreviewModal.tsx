@@ -44,8 +44,8 @@ const navigationSections: NavigationSection[] = [
     subsections: [
       { id: 'scheduling', title: 'Scheduling and Our Calendar' },
       { id: 'weekday-weekend', title: 'Weekday and Weekend Schedule', current: true },
-      { id: 'holiday', title: 'Holiday Schedule' },
       { id: 'school-breaks', title: 'School Breaks' },
+      { id: 'holiday', title: 'Holiday Schedule' },
       { id: 'transportation', title: 'Transportation and Exchange' },
       { id: 'other-travel', title: 'Other Travel Considerations' },
     ],
@@ -63,6 +63,7 @@ const navigationSections: NavigationSection[] = [
     id: 'final',
     title: 'FINAL CONSIDERATIONS',
     subsections: [
+      { id: 'number-of-overnights', title: 'Number of Overnights' },
       { id: 'relocation', title: 'Relocation' },
       { id: 'changes', title: 'Changes or Modifications to the Agreement' },
     ],
@@ -71,8 +72,8 @@ const navigationSections: NavigationSection[] = [
 
 const contentSections: SectionContent[] = [
   { id: 'weekday-weekend', title: 'Weekday and Weekend Schedule', agreed: false },
-  { id: 'holiday', title: 'Holiday Schedule', agreed: false },
   { id: 'school-breaks', title: 'School Breaks', agreed: false },
+  { id: 'holiday', title: 'Holiday Schedule', agreed: false },
   { id: 'transportation', title: 'Transportation and Exchange', agreed: false },
   { id: 'other-travel', title: 'Other Travel Considerations', agreed: false },
 ];
