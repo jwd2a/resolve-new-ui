@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { XMarkIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, PlusIcon, TrashIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { HOLIDAY_CATEGORIES, ALL_PRESET_HOLIDAYS, getCategoryForHoliday } from './holidayData';
 
 type ScheduleType = 'normal' | 'alternating' | 'split' | 'justin' | 'michael';
 type TimingType = 'mutual' | 'specify';
@@ -20,23 +21,8 @@ interface Holiday {
   id: string;
   name: string;
   config: HolidayConfig;
+  category?: string;
 }
-
-const COMMON_HOLIDAYS = [
-  "New Year's Day",
-  "Martin Luther King Jr. Day",
-  "Presidents' Day",
-  "Memorial Day",
-  "Juneteenth",
-  "Independence Day",
-  "Labor Day",
-  "Columbus Day / Indigenous Peoples' Day",
-  "Veterans Day",
-  "Thanksgiving",
-  "Christmas Eve",
-  "Christmas Day",
-  "New Year's Eve",
-];
 
 interface SelectHolidaysModalProps {
   isOpen: boolean;
@@ -54,6 +40,7 @@ export default function SelectHolidaysModal({
   const [selectedHolidayNames, setSelectedHolidayNames] = useState<string[]>([]);
   const [customHolidays, setCustomHolidays] = useState<string[]>([]);
   const [customHolidayInput, setCustomHolidayInput] = useState('');
+  const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -61,14 +48,19 @@ export default function SelectHolidaysModal({
       setSelectedHolidayNames([]);
       setCustomHolidays([]);
       setCustomHolidayInput('');
+      setExpandedCategories([]);
     }
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev =>
+      prev.includes(category)
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
 
-  const availableCommonHolidays = COMMON_HOLIDAYS.filter(
-    name => !existingHolidayNames.includes(name)
-  );
+  if (!isOpen) return null;
 
   const toggleHolidaySelection = (name: string) => {
     setSelectedHolidayNames(prev =>
@@ -78,13 +70,25 @@ export default function SelectHolidaysModal({
     );
   };
 
+  const selectAllInCategory = (holidays: string[]) => {
+    const available = holidays.filter(name => !existingHolidayNames.includes(name));
+    const allSelected = available.every(name => selectedHolidayNames.includes(name));
+    if (allSelected) {
+      // Deselect all in this category
+      setSelectedHolidayNames(prev => prev.filter(name => !available.includes(name)));
+    } else {
+      // Select all in this category
+      setSelectedHolidayNames(prev => [...new Set([...prev, ...available])]);
+    }
+  };
+
   const addCustomHoliday = () => {
     const trimmedName = customHolidayInput.trim();
     if (
       trimmedName.length >= 2 &&
       !customHolidays.includes(trimmedName) &&
       !existingHolidayNames.includes(trimmedName) &&
-      !COMMON_HOLIDAYS.includes(trimmedName)
+      !ALL_PRESET_HOLIDAYS.includes(trimmedName)
     ) {
       setCustomHolidays([...customHolidays, trimmedName]);
       setSelectedHolidayNames([...selectedHolidayNames, trimmedName]);
@@ -107,6 +111,7 @@ export default function SelectHolidaysModal({
         alternatingOddYearParent: 'justin',
         timingType: 'mutual',
       },
+      category: getCategoryForHoliday(name),
     }));
     onAddHolidays(newHolidays);
     onClose();
@@ -115,6 +120,11 @@ export default function SelectHolidaysModal({
   const handleClose = () => {
     onClose();
   };
+
+  // Check if any categories have available holidays
+  const hasAvailableHolidays = HOLIDAY_CATEGORIES.some(cat =>
+    cat.holidays.some(name => !existingHolidayNames.includes(name))
+  );
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
@@ -147,30 +157,78 @@ export default function SelectHolidaysModal({
 
           {/* Content */}
           <div className="px-6 py-6">
-            {/* Common Holidays */}
-            {availableCommonHolidays.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3">Common Holidays</h3>
-                <div className="space-y-2">
-                  {availableCommonHolidays.map((name) => (
-                    <label
-                      key={name}
-                      className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedHolidayNames.includes(name)}
-                        onChange={() => toggleHolidaySelection(name)}
-                        className="w-4 h-4 text-primary focus:ring-primary rounded"
-                      />
-                      <span className="ml-3 text-sm text-gray-900">{name}</span>
-                    </label>
-                  ))}
-                </div>
+            {/* Categorized Holidays */}
+            {hasAvailableHolidays && (
+              <div className="space-y-6 mb-6">
+                {HOLIDAY_CATEGORIES.map((cat) => {
+                  const availableHolidays = cat.holidays.filter(
+                    name => !existingHolidayNames.includes(name)
+                  );
+                  if (availableHolidays.length === 0) return null;
+
+                  const allSelected = availableHolidays.every(name =>
+                    selectedHolidayNames.includes(name)
+                  );
+
+                  const isExpanded = expandedCategories.includes(cat.category);
+                  const selectedCount = availableHolidays.filter(name =>
+                    selectedHolidayNames.includes(name)
+                  ).length;
+
+                  return (
+                    <div key={cat.category} className="border border-gray-200 rounded-lg overflow-hidden">
+                      <button
+                        onClick={() => toggleCategory(cat.category)}
+                        className="w-full flex items-center justify-between px-4 py-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex items-center space-x-2">
+                          {isExpanded ? (
+                            <ChevronUpIcon className="w-4 h-4 text-gray-400" />
+                          ) : (
+                            <ChevronDownIcon className="w-4 h-4 text-gray-400" />
+                          )}
+                          <h4 className="text-sm font-semibold text-gray-700">{cat.category}</h4>
+                          {selectedCount > 0 && (
+                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                              {selectedCount} selected
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-xs text-gray-400">{availableHolidays.length} holidays</span>
+                      </button>
+                      {isExpanded && (
+                        <div className="px-4 py-3 space-y-2">
+                          <div className="flex justify-end mb-1">
+                            <button
+                              onClick={() => selectAllInCategory(cat.holidays)}
+                              className="text-xs text-primary hover:text-primary-dark transition-colors"
+                            >
+                              {allSelected ? 'All Selected' : 'Select All'}
+                            </button>
+                          </div>
+                          {availableHolidays.map((name) => (
+                            <label
+                              key={name}
+                              className="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={selectedHolidayNames.includes(name)}
+                                onChange={() => toggleHolidaySelection(name)}
+                                className="w-4 h-4 text-primary focus:ring-primary rounded"
+                              />
+                              <span className="ml-3 text-sm text-gray-900">{name}</span>
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
 
-            {availableCommonHolidays.length === 0 && customHolidays.length === 0 && (
+            {!hasAvailableHolidays && customHolidays.length === 0 && (
               <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">
                 <p className="text-sm text-gray-600">
                   All common holidays have been added. You can add custom holidays below.

@@ -1,0 +1,102 @@
+<h2>Dashboard: Async-Aware Section List</h2>
+<p class="subtitle">How each section looks in the ParentingPlanProgress view depending on its state and whose turn it is</p>
+
+<!-- Section: Your Action Needed -->
+<h3 style="margin-top: 2rem; margin-bottom: 1rem;">Sections needing YOUR action</h3>
+<p style="color: #888; font-size: 0.85rem; margin-bottom: 1rem;">These float to the top — the parent always knows what to do next</p>
+
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+  <!-- Ready to draft -->
+  <div style="background: #1e1e2e; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #f59e0b;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #f59e0b22; display: flex; align-items: center; justify-content: center;">
+      <span style="color: #f59e0b; font-size: 1.1rem;">✏️</span>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #e2e8f0;">Holiday & Vacation Schedule</div>
+      <div style="font-size: 0.8rem; color: #888;">Timesharing · Ready to draft</div>
+    </div>
+    <button style="background: #f59e0b; color: #000; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Start Draft</button>
+  </div>
+
+  <!-- Needs your review -->
+  <div style="background: #1e1e2e; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #3b82f6;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #3b82f622; display: flex; align-items: center; justify-content: center;">
+      <span style="color: #3b82f6; font-size: 1.1rem;">👁</span>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #e2e8f0;">Daily Routine & Weekday Schedule</div>
+      <div style="font-size: 0.8rem; color: #888;">Timesharing · <span style="color: #3b82f6;">Michael submitted a draft</span></div>
+    </div>
+    <button style="background: #3b82f6; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Review</button>
+  </div>
+
+  <!-- Contested — they edited your draft -->
+  <div style="background: #1e1e2e; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #ef4444;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #ef444422; display: flex; align-items: center; justify-content: center;">
+      <span style="color: #ef4444; font-size: 1.1rem;">↩</span>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #e2e8f0;">Medical & Health Decisions</div>
+      <div style="font-size: 0.8rem; color: #888;">Decision-Making · <span style="color: #ef4444;">Michael made changes · 2 fields edited</span></div>
+    </div>
+    <button style="background: #ef4444; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Review Changes</button>
+  </div>
+</div>
+
+<!-- Section: Waiting on Co-Parent -->
+<h3 style="margin-top: 2.5rem; margin-bottom: 1rem;">Waiting on Michael</h3>
+<p style="color: #888; font-size: 0.85rem; margin-bottom: 1rem;">You've done your part — ball's in their court</p>
+
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+  <div style="background: #1e1e2e; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #555; opacity: 0.7;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #55555522; display: flex; align-items: center; justify-content: center;">
+      <span style="color: #888; font-size: 1.1rem;">⏳</span>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #e2e8f0;">Education & School Decisions</div>
+      <div style="font-size: 0.8rem; color: #888;">Decision-Making · You submitted a draft · Sent 2 days ago</div>
+    </div>
+    <span style="color: #666; font-size: 0.8rem;">Awaiting review</span>
+  </div>
+</div>
+
+<!-- Section: Agreed / Ready to Sign -->
+<h3 style="margin-top: 2.5rem; margin-bottom: 1rem;">Ready to sign</h3>
+<p style="color: #888; font-size: 0.85rem; margin-bottom: 1rem;">Both parents agree — just needs signatures</p>
+
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+  <div style="background: #1e1e2e; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #10b981;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #10b98122; display: flex; align-items: center; justify-content: center;">
+      <span style="color: #10b981; font-size: 1.1rem;">✓</span>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #e2e8f0;">Communication Methods</div>
+      <div style="font-size: 0.8rem; color: #888;">Communication · Both agreed</div>
+    </div>
+    <button style="background: #10b981; color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Sign</button>
+  </div>
+</div>
+
+<!-- Section: Not Started -->
+<h3 style="margin-top: 2.5rem; margin-bottom: 1rem;">Not started</h3>
+
+<div style="display: flex; flex-direction: column; gap: 0.75rem;">
+  <div style="background: #1e1e2e; border-radius: 12px; padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; border-left: 4px solid #333; opacity: 0.5;">
+    <div style="width: 36px; height: 36px; border-radius: 50%; background: #33333322; display: flex; align-items: center; justify-content: center;">
+      <span style="color: #555; font-size: 1.1rem;">○</span>
+    </div>
+    <div style="flex: 1;">
+      <div style="font-weight: 600; color: #e2e8f0;">Transportation & Exchanges</div>
+      <div style="font-size: 0.8rem; color: #666;">Timesharing · Complete lessons first</div>
+    </div>
+    <span style="color: #555; font-size: 0.8rem;">Locked</span>
+  </div>
+</div>
+
+<!-- Key insight callout -->
+<div style="margin-top: 2.5rem; padding: 1.25rem 1.5rem; background: #1e1e2e; border: 1px solid #6366f133; border-radius: 12px;">
+  <div style="font-weight: 600; color: #a5b4fc; margin-bottom: 0.5rem;">Design principle: Action-oriented grouping</div>
+  <div style="color: #888; font-size: 0.9rem; line-height: 1.5;">
+    Instead of grouping by category (Timesharing, Decision-Making, etc.), the dashboard groups by <strong style="color: #e2e8f0;">what you need to do next</strong>. This answers the parent's #1 question: "What should I work on?" Categories are still shown as labels, but the primary sort is by action needed. Parents can toggle back to the category view if they prefer.
+  </div>
+</div>

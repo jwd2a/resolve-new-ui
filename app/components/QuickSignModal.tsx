@@ -70,7 +70,7 @@ export default function QuickSignModal({
           <div className="flex items-center space-x-3">
             <CheckCircleIcon className="w-6 h-6 text-white" />
             <div>
-              <h2 className="text-xl font-bold text-white">Sign Completed Sections</h2>
+              <h2 className="text-xl font-bold text-white">Sign Agreed Sections</h2>
               <p className="text-white/90 text-sm">{sections.length} sections ready for signature</p>
             </div>
           </div>

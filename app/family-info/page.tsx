@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { usePlan } from '@/app/PlanContext';
+import SoloModeConfirmModal from '@/app/components/SoloModeConfirmModal';
 import {
   UserIcon,
   PhoneIcon,
@@ -38,6 +40,8 @@ interface Jurisdiction {
 
 export default function FamilyInfoPage() {
   const [editingSection, setEditingSection] = useState<string | null>(null);
+  const [showSoloModeModal, setShowSoloModeModal] = useState(false);
+  const { isProposed, setIsProposed } = usePlan();
 
   // Mock data
   const parents: Parent[] = [
@@ -213,6 +217,27 @@ export default function FamilyInfoPage() {
                 </div>
               ))}
             </div>
+            {/* Proposed mode toggle */}
+            <div className="mt-6 pt-4 border-t border-gray-200">
+              <div className="flex items-start space-x-3">
+                <input
+                  type="checkbox"
+                  checked={isProposed}
+                  onChange={() => setShowSoloModeModal(true)}
+                  className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/50 cursor-pointer"
+                />
+                <div>
+                  <span className="text-sm font-medium text-gray-900">
+                    Complete this plan without my co-parent
+                  </span>
+                  {isProposed && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Your plan will be marked as a Proposed Parenting Plan. Signatures will not be collected.
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
           </SectionCard>
 
           {/* Contact Information */}
@@ -305,6 +330,14 @@ export default function FamilyInfoPage() {
             </div>
           </SectionCard>
         </div>
+
+        <SoloModeConfirmModal
+          isOpen={showSoloModeModal}
+          onClose={() => setShowSoloModeModal(false)}
+          onConfirm={() => setIsProposed(!isProposed)}
+          direction={isProposed ? 'disable' : 'enable'}
+          coParentName="Michael"
+        />
       </main>
     </div>
   );

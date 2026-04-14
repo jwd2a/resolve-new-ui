@@ -9,13 +9,22 @@ import SessionPrompt from './components/SessionPrompt';
 import OnboardingChecklist, { OnboardingTask } from './components/OnboardingChecklist';
 import CourseOutline from './components/CourseOutline';
 import PreCourseRequirementsBanner, { PreCourseRequirementsState } from './components/PreCourseRequirementsBanner';
-import { Section } from './types/section';
+import { Section, SectionState } from './types/section';
+import AsyncSectionView from '@/app/components/AsyncSectionView';
+import QuickSignModal from '@/app/components/QuickSignModal';
+import SoloModeConfirmModal from './components/SoloModeConfirmModal';
+import { usePlan } from '@/app/PlanContext';
 
 export default function Home() {
+  const { isProposed, setIsProposed } = usePlan();
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [asyncViewSection, setAsyncViewSection] = useState<Section | null>(null);
+  const [showSignModal, setShowSignModal] = useState(false);
   const [isOnboarding, setIsOnboarding] = useState(false);
   const [showCoursePreview, setShowCoursePreview] = useState(false);
   const [showPreCourse, setShowPreCourse] = useState(false);
+  const [showSoloModeModal, setShowSoloModeModal] = useState(false);
+  const [soloModalDirection, setSoloModalDirection] = useState<'enable' | 'disable'>('enable');
   const [preCourseState, setPreCourseState] = useState<PreCourseRequirementsState>({
     inviteStatus: 'accepted',
     waiverStatus: { you: false, them: false },
@@ -160,36 +169,49 @@ export default function Home() {
   // Mock parenting plan sections with new structure
   const mockSections: Section[] = [
     // Timesharing
-    { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '~20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
-    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'completed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
     { id: 'weekday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekday Schedule', description: 'Define weekday schedule', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/weekday' },
-    { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'not-started', estimatedTime: '~20 min', formUrl: '/forms/breaks' },
-    { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'completed', estimatedTime: '~10 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
+    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'agreed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
+    { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'in-review' as SectionState, estimatedTime: '~20 min', formUrl: '/forms/breaks', draftedBy: 'them' as const, currentTurn: 'you' as const, draftData: { springBreak: 'Alternating years', winterBreak: 'Split evenly — first half with one parent, second half with other', summerBreak: 'Each parent gets two consecutive weeks' } },
+    { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '~20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
+    { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'agreed', estimatedTime: '~10 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
 
     // Decision-Making
     { id: 'shared-decisions', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Shared Decision-Making', description: 'Major decisions requiring both parents', state: 'signed', estimatedTime: '~15 min', formUrl: '/forms/shared-decisions', signatureStatus: { you: true, them: true } },
-    { id: 'day-to-day', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Day-to-Day Decisions', description: 'Routine daily decisions', state: 'completed', estimatedTime: '~10 min', formUrl: '/forms/daily', signatureStatus: { you: false, them: false } },
+    { id: 'day-to-day', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Day-to-Day Decisions', description: 'Routine daily decisions', state: 'agreed', estimatedTime: '~10 min', formUrl: '/forms/daily', signatureStatus: { you: false, them: false } },
     { id: 'extracurricular', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Extra-curricular Activities', description: 'Sports, clubs, and activities', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/activities' },
-    { id: 'healthcare', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Healthcare Decisions', description: 'Medical care and insurance', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/healthcare' },
+    { id: 'healthcare', moduleId: 'decision-making', moduleName: 'Parental Responsibility', category: 'decision-making', title: 'Healthcare Decisions', description: 'Medical care and insurance', state: 'contested' as SectionState, estimatedTime: '~15 min', formUrl: '/forms/healthcare', draftedBy: 'you' as const, currentTurn: 'you' as const, draftData: { primaryPhysician: 'Both parents must agree on primary physician', emergencyDecisions: 'Either parent can authorize emergency treatment', mentalHealth: 'Both parents must consent to ongoing therapy' }, editHistory: [ { fieldId: 'mentalHealth', previousValue: 'Primary custodial parent decides on therapy', newValue: 'Both parents must consent to ongoing therapy', editedBy: 'them' as const, editedAt: new Date('2026-03-09') } ] },
 
     // Communication
     { id: 'communication-methods', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Communication Protocols', description: 'How you\'ll communicate', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/communication' },
     { id: 'information-sharing', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Information Sharing', description: 'Sharing important updates', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/info-sharing' },
 
     // Other
+    { id: 'number-of-overnights', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Number of Overnights', description: 'Calculate annual overnight totals', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/overnights' },
     { id: 'relocation', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Relocation', description: 'Plans if either parent moves', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/relocation' },
     { id: 'modifications', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Changes & Modifications', description: 'How to update this plan', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/modifications' },
   ];
 
   const handleSectionClick = (section: Section) => {
-    if (section.state === 'not-started') {
-      alert('Start a session to work on this section together');
-    } else if (section.state === 'completed') {
-      alert('Open signing modal for: ' + section.title);
-      // TODO: Open QuickSignModal
-    } else if (section.state === 'signed') {
-      alert('View signed agreement for: ' + section.title);
-      // TODO: Open agreement preview
+    switch (section.state) {
+      case 'not-started':
+        console.log('Start section:', section.id);
+        break;
+      case 'draft':
+      case 'completed-draft':
+      case 'in-review':
+      case 'contested':
+        setAsyncViewSection(section);
+        break;
+      case 'agreed':
+        if (isProposed) {
+          setShowPreviewModal(true);
+        } else {
+          setShowSignModal(true);
+        }
+        break;
+      case 'signed':
+        setShowPreviewModal(true);
+        break;
     }
   };
 
@@ -201,6 +223,11 @@ export default function Home() {
   const handleStartRemote = () => {
     alert('Starting remote session...');
     // TODO: Create session with type 'remote'
+  };
+
+  const handleOpenSoloModal = (direction: 'enable' | 'disable') => {
+    setSoloModalDirection(direction);
+    setShowSoloModeModal(true);
   };
 
   return (
@@ -242,7 +269,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center space-x-4">
-              {!isOnboarding && userData.coParentOnline && (
+              {!isOnboarding && !isProposed && userData.coParentOnline && (
                 <div className="flex items-center space-x-2">
                   <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-sm text-gray-700">{userData.coParentName} is online</span>
@@ -286,7 +313,11 @@ export default function Home() {
             <div className="flex items-start justify-between mb-8">
               <div>
                 <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome back, {userData.name}</h1>
-                <p className="text-gray-600">Collaborate with your co-parent to complete your parenting plan.</p>
+                <p className="text-gray-600">
+                  {isProposed
+                    ? 'Complete your proposed parenting plan.'
+                    : 'Collaborate with your co-parent to complete your parenting plan.'}
+                </p>
               </div>
               <div className="text-right">
                 <div className="text-sm text-gray-600 mb-1">Target completion</div>
@@ -303,24 +334,63 @@ export default function Home() {
               </div>
             </div>
 
+            {isProposed && (
+              <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                  <p className="text-sm text-purple-800 font-medium">
+                    Proposed Plan Mode — You are completing this plan without your co-parent
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleOpenSoloModal('disable')}
+                  className="text-sm text-purple-600 hover:text-purple-800 underline"
+                >
+                  Change
+                </button>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Session Prompt */}
-                <SessionPrompt
-                  coParentName={userData.coParentName}
-                  coParentOnline={userData.coParentOnline}
-                  lastSessionDate={new Date('2026-01-01')}
-                  onStartInPerson={handleStartInPerson}
-                  onStartRemote={handleStartRemote}
-                  canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
-                />
+                {isProposed ? (
+                  <SessionPrompt
+                    coParentName={userData.coParentName}
+                    coParentOnline={false}
+                    isSoloMode
+                    onStartSession={() => alert('Starting solo session...')}
+                  />
+                ) : (
+                  <>
+                    <SessionPrompt
+                      coParentName={userData.coParentName}
+                      coParentOnline={userData.coParentOnline}
+                      lastSessionDate={new Date('2026-01-01')}
+                      onStartInPerson={handleStartInPerson}
+                      onStartRemote={handleStartRemote}
+                      canStartCourse={!showPreCourse || (preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
+                    />
+                    {/* Solo mode entry point */}
+                    <div className="text-center">
+                      <button
+                        onClick={() => handleOpenSoloModal('enable')}
+                        className="text-sm text-gray-500 hover:text-gray-700 underline underline-offset-2 transition-colors"
+                      >
+                        Co-parent unable to participate? Switch to solo mode
+                      </button>
+                    </div>
+                  </>
+                )}
 
                 {/* Parenting Plan Progress - THE MAIN COMPONENT */}
                 <ParentingPlanProgress
                   sections={mockSections}
                   onSectionClick={handleSectionClick}
+                  coParentName="Michael"
                   previewMode={showPreCourse && !(preCourseState.inviteStatus === 'accepted' && preCourseState.waiverStatus.you && preCourseState.waiverStatus.them && preCourseState.paymentStatus.you && preCourseState.paymentStatus.them)}
+                  isProposed={isProposed}
                 />
               </div>
 
@@ -356,6 +426,61 @@ export default function Home() {
       <ParentingPlanPreviewModal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
+        isProposed={isProposed}
+      />
+
+      {asyncViewSection && (
+        <div className="fixed inset-0 bg-white z-50 overflow-y-auto">
+          <div className="py-8 px-4">
+            <AsyncSectionView
+              section={asyncViewSection}
+              coParentName="Michael"
+              isProposed={isProposed}
+              onSave={(data) => {
+                console.log('Saved draft:', data);
+                setAsyncViewSection(null);
+              }}
+              onSubmitForReview={(data) => {
+                console.log('Submitted for review:', data);
+                setAsyncViewSection(null);
+              }}
+              onAccept={() => {
+                console.log('Accepted');
+                setAsyncViewSection(null);
+              }}
+              onSubmitChanges={(data, edits) => {
+                console.log('Submitted changes:', data, edits);
+                setAsyncViewSection(null);
+              }}
+              onComplete={(data) => {
+                console.log('Completed proposed section:', data);
+                setAsyncViewSection(null);
+              }}
+              onStartSession={isProposed ? undefined : () => { setAsyncViewSection(null); }}
+              onClose={() => setAsyncViewSection(null)}
+            />
+          </div>
+        </div>
+      )}
+
+      {showSignModal && !isProposed && (
+        <QuickSignModal
+          sections={mockSections.filter(s => s.state === 'agreed' && !s.signatureStatus?.you)}
+          coParentName="Michael"
+          onClose={() => setShowSignModal(false)}
+          onSign={(sectionIds, signature) => {
+            console.log('Signed sections:', sectionIds, 'with signature:', signature);
+            setShowSignModal(false);
+          }}
+        />
+      )}
+
+      <SoloModeConfirmModal
+        isOpen={showSoloModeModal}
+        onClose={() => setShowSoloModeModal(false)}
+        onConfirm={() => setIsProposed(soloModalDirection === 'enable')}
+        direction={soloModalDirection}
+        coParentName={userData.coParentName}
       />
     </div>
   );

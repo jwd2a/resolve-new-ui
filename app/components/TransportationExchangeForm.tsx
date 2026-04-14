@@ -1,10 +1,12 @@
 'use client';
 
-import { SparklesIcon } from '@heroicons/react/24/outline';
+import { SparklesIcon, PencilIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import SectionSigningApproval from './SectionSigningApproval';
+import { usePlan } from '@/app/PlanContext';
 
 export default function TransportationExchangeForm() {
+  const { isProposed } = usePlan();
   const [isGenerated, setIsGenerated] = useState(false);
   const [formData, setFormData] = useState({
     exchangeDistance: '',
@@ -28,8 +30,8 @@ export default function TransportationExchangeForm() {
     // In real app, this would allow editing the form
   };
 
-  const handleApprove = (parent1Initials: string, parent2Initials: string) => {
-    console.log('Approved with initials:', parent1Initials, parent2Initials);
+  const handleApprove = (initials: string) => {
+    console.log('Approved with initials:', initials);
     // In real app, this would save approval and navigate to next section
   };
 
@@ -58,8 +60,37 @@ export default function TransportationExchangeForm() {
     <p>Both parents agree to keep exchanges brief, neutral, and focused on the child(ren). We will avoid discussing adult matters during exchanges and will maintain a positive demeanor for the benefit of the child(ren).</p>
   `;
 
-  // If generated, show signing approval
+  // If generated, show signing approval (or simplified view in proposed mode)
   if (isGenerated) {
+    if (isProposed) {
+      return (
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold text-foreground">Transportation and Exchange</h2>
+
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <div className="prose prose-sm max-w-none">
+              <div dangerouslySetInnerHTML={{ __html: generatedLegalText }} />
+            </div>
+
+            <button
+              onClick={handleEditAndRegenerate}
+              className="flex items-center space-x-2 text-primary hover:text-primary/80 text-sm font-medium mt-6 transition-colors"
+            >
+              <PencilIcon className="w-4 h-4" />
+              <span>Edit Answers and regenerate this section</span>
+            </button>
+          </div>
+
+          <button
+            onClick={() => handleApprove('')}
+            className="w-full py-2.5 text-sm font-semibold text-white bg-primary rounded-lg hover:bg-primary-dark transition-colors"
+          >
+            Complete
+          </button>
+        </div>
+      );
+    }
+
     return (
       <SectionSigningApproval
         sectionTitle="Transportation and Exchange"
@@ -67,8 +98,8 @@ export default function TransportationExchangeForm() {
         onEditAndRegenerate={handleEditAndRegenerate}
         onApprove={handleApprove}
         onSkip={handleSkip}
-        parent1Name="Justin Davis"
-        parent2Name="Co-Parent"
+        parentName="Justin Davis"
+        coParentName="Co-Parent"
       />
     );
   }

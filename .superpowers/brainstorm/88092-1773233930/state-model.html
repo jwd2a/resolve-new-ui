@@ -1,0 +1,119 @@
+<h2>Section State Machine</h2>
+<p class="subtitle">Each section flows through these states. Both sync and async paths converge on the same end states.</p>
+
+<div style="margin: 2rem 0;">
+  <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin-bottom: 2rem;">
+
+    <!-- not-started -->
+    <div style="background: #2a2a3e; border: 2px solid #555; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #888; margin-bottom: 0.25rem;">Initial</div>
+      <div style="font-weight: 600; color: #ccc;">not-started</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">Neither parent has<br>begun this section</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; color: #666; font-size: 1.5rem;">→</div>
+
+    <!-- learning -->
+    <div style="background: #2a2a3e; border: 2px solid #6366f1; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #6366f1; margin-bottom: 0.25rem;">New</div>
+      <div style="font-weight: 600; color: #a5b4fc;">learning</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">One or both parents<br>watching lessons</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; color: #666; font-size: 1.5rem;">→</div>
+
+    <!-- draft -->
+    <div style="background: #2a2a3e; border: 2px solid #f59e0b; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #f59e0b; margin-bottom: 0.25rem;">New</div>
+      <div style="font-weight: 600; color: #fcd34d;">draft</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">A parent is filling<br>out the form</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; color: #666; font-size: 1.5rem;">→</div>
+
+    <!-- in-review -->
+    <div style="background: #2a2a3e; border: 2px solid #3b82f6; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #3b82f6; margin-bottom: 0.25rem;">New</div>
+      <div style="font-weight: 600; color: #93c5fd;">in-review</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">Co-parent reviewing<br>the draft</div>
+    </div>
+  </div>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center;">
+    <!-- contested -->
+    <div style="background: #2a2a3e; border: 2px solid #ef4444; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #ef4444; margin-bottom: 0.25rem;">New</div>
+      <div style="font-weight: 600; color: #fca5a5;">contested</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">Reviewer edited;<br>back to drafter</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; color: #666; font-size: 1.5rem;">→</div>
+
+    <!-- agreed -->
+    <div style="background: #2a2a3e; border: 2px solid #10b981; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #10b981; margin-bottom: 0.25rem;">Existing</div>
+      <div style="font-weight: 600; color: #6ee7b7;">agreed</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">Both parents accept<br>the answers</div>
+    </div>
+
+    <!-- Arrow -->
+    <div style="display: flex; align-items: center; color: #666; font-size: 1.5rem;">→</div>
+
+    <!-- signed -->
+    <div style="background: #2a2a3e; border: 2px solid #10b981; border-radius: 12px; padding: 1rem 1.25rem; min-width: 140px; text-align: center;">
+      <div style="font-size: 0.7rem; text-transform: uppercase; color: #10b981; margin-bottom: 0.25rem;">Existing</div>
+      <div style="font-weight: 600; color: #6ee7b7;">signed</div>
+      <div style="font-size: 0.75rem; color: #888; margin-top: 0.5rem;">Both initials<br>applied</div>
+    </div>
+  </div>
+
+  <!-- Sync shortcut note -->
+  <div style="margin-top: 2rem; padding: 1rem 1.5rem; background: #1e1e2e; border-left: 3px solid #6366f1; border-radius: 0 8px 8px 0;">
+    <div style="font-weight: 600; color: #a5b4fc; margin-bottom: 0.25rem;">Sync shortcut</div>
+    <div style="color: #888; font-size: 0.9rem;">When parents work together in a live session, they skip <strong style="color:#fcd34d">draft</strong> → <strong style="color:#93c5fd">in-review</strong> → <strong style="color:#fca5a5">contested</strong> and go straight from <strong style="color:#a5b4fc">learning</strong> to <strong style="color:#6ee7b7">agreed</strong> (the existing "completed" state, renamed).</div>
+  </div>
+
+  <!-- Contest loop note -->
+  <div style="margin-top: 1rem; padding: 1rem 1.5rem; background: #1e1e2e; border-left: 3px solid #ef4444; border-radius: 0 8px 8px 0;">
+    <div style="font-weight: 600; color: #fca5a5; margin-bottom: 0.25rem;">Contest loop</div>
+    <div style="color: #888; font-size: 0.9rem;"><strong style="color:#fca5a5">contested</strong> ↔ <strong style="color:#93c5fd">in-review</strong> can cycle back and forth as parents edit. Each edit swaps whose turn it is. Either parent can accept at any time to move to <strong style="color:#6ee7b7">agreed</strong>.</div>
+  </div>
+</div>
+
+<h3 style="margin-top: 2rem;">Key transitions</h3>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 1rem;">
+  <div style="background: #1e1e2e; padding: 0.75rem 1rem; border-radius: 8px;">
+    <span style="color: #f59e0b;">Draft submitted</span>
+    <span style="color: #666;"> → </span>
+    <span style="color: #3b82f6;">in-review</span>
+  </div>
+  <div style="background: #1e1e2e; padding: 0.75rem 1rem; border-radius: 8px;">
+    <span style="color: #3b82f6;">Reviewer accepts</span>
+    <span style="color: #666;"> → </span>
+    <span style="color: #10b981;">agreed</span>
+  </div>
+  <div style="background: #1e1e2e; padding: 0.75rem 1rem; border-radius: 8px;">
+    <span style="color: #3b82f6;">Reviewer edits</span>
+    <span style="color: #666;"> → </span>
+    <span style="color: #ef4444;">contested</span>
+  </div>
+  <div style="background: #1e1e2e; padding: 0.75rem 1rem; border-radius: 8px;">
+    <span style="color: #ef4444;">Drafter accepts edits</span>
+    <span style="color: #666;"> → </span>
+    <span style="color: #10b981;">agreed</span>
+  </div>
+  <div style="background: #1e1e2e; padding: 0.75rem 1rem; border-radius: 8px;">
+    <span style="color: #ef4444;">Drafter re-edits</span>
+    <span style="color: #666;"> → </span>
+    <span style="color: #3b82f6;">in-review</span>
+  </div>
+  <div style="background: #1e1e2e; padding: 0.75rem 1rem; border-radius: 8px;">
+    <span style="color: #10b981;">Both sign</span>
+    <span style="color: #666;"> → </span>
+    <span style="color: #10b981;">signed</span>
+  </div>
+</div>
