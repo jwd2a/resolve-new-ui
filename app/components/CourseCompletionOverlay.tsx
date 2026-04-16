@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-type OverlayState = 'waiting' | 'celebrating' | 'next-steps' | 'goodbye';
+type OverlayState = 'waiting' | 'celebrating' | 'goodbye';
 
 interface CourseCompletionOverlayProps {
   isOpen: boolean;
@@ -24,7 +24,6 @@ export default function CourseCompletionOverlay({
   onSetReminder,
 }: CourseCompletionOverlayProps) {
   const [state, setState] = useState<OverlayState>('waiting');
-  const [showContinueButton, setShowContinueButton] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // Fade in on mount
@@ -50,15 +49,6 @@ export default function CourseCompletionOverlay({
       setState('celebrating');
     }
   }, [coParentFinished, state]);
-
-  // Show continue button after 2 seconds in celebrating state
-  useEffect(() => {
-    if (state === 'celebrating') {
-      const timer = setTimeout(() => setShowContinueButton(true), 2000);
-      return () => clearTimeout(timer);
-    }
-    setShowContinueButton(false);
-  }, [state]);
 
   // Auto-navigate after goodbye state
   useEffect(() => {
@@ -146,10 +136,10 @@ export default function CourseCompletionOverlay({
         </div>
       )}
 
-      {/* Celebrating State */}
+      {/* Celebrating + Next Steps (combined) */}
       {state === 'celebrating' && (
         <div
-          className="flex flex-col items-center justify-center text-center px-6"
+          className="flex flex-col items-center text-center px-6 w-full overflow-y-auto max-h-full py-10"
           style={{ animation: 'scale-in 400ms ease-out forwards' }}
         >
           {/* Confetti dots */}
@@ -183,63 +173,11 @@ export default function CourseCompletionOverlay({
             ))}
           </div>
 
-          {/* Checkmark icon */}
-          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path
-                d="M20 6L9 17l-5-5"
-                style={{
-                  strokeDasharray: 24,
-                  strokeDashoffset: 24,
-                  animation: 'checkmark-draw 600ms 400ms ease-out forwards',
-                }}
-              />
-            </svg>
-          </div>
-
-          {/* Text */}
-          <h1 className="text-[32px] font-bold text-foreground mb-3">Your Parenting Plan is Complete</h1>
-          <p className="text-gray-600 text-[17px] max-w-[500px] leading-relaxed mb-9">
-            You did it — together. This plan is the result of real cooperation, and your children will benefit from the effort you&apos;ve both put in.
-          </p>
-
-          {/* Elevated video feeds */}
+          {/* Large video feeds - the celebration is about THEM */}
           <div
-            className="flex gap-5 mb-9"
+            className="flex gap-6 mb-6"
             style={{ animation: 'fade-in-up 500ms 300ms ease-out forwards', opacity: 0 }}
           >
-            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-primary/30 overflow-hidden flex items-center justify-center shadow-lg">
-              <div className="w-12 h-12 rounded-full bg-primary/40 flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">You</span>
-              </div>
-            </div>
-            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-primary/30 overflow-hidden flex items-center justify-center shadow-lg">
-              <div className="w-12 h-12 rounded-full bg-gray-600/40 flex items-center justify-center">
-                <span className="text-white text-sm font-semibold">CP</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Continue button - fades in after 2 seconds */}
-          <button
-            onClick={() => setState('next-steps')}
-            className={`bg-primary text-white font-semibold text-base px-9 py-3.5 rounded-xl shadow-md hover:bg-primary-dark transition-all duration-500 ${
-              showContinueButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-            }`}
-          >
-            Continue &#10132;
-          </button>
-        </div>
-      )}
-
-      {/* Next Steps State */}
-      {state === 'next-steps' && (
-        <div
-          className="flex flex-col items-center text-center px-6 w-full overflow-y-auto max-h-full py-12"
-          style={{ animation: 'scale-in 400ms ease-out forwards' }}
-        >
-          {/* Large video feeds - the celebration is about THEM */}
-          <div className="flex gap-6 mb-8">
             <div className="w-[240px] h-[170px] bg-gray-900 rounded-2xl border-[3px] border-primary/20 overflow-hidden flex items-center justify-center shadow-lg">
               <div className="w-14 h-14 rounded-full bg-primary/40 flex items-center justify-center">
                 <span className="text-white text-base font-semibold">You</span>
@@ -252,13 +190,33 @@ export default function CourseCompletionOverlay({
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-foreground mb-1">Great work, both of you</h2>
-          <p className="text-gray-500 text-sm mb-8 max-w-md">
-            Your cooperation made this possible. Here are some things you can do with your completed plan.
+          {/* Checkmark + heading */}
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path
+                  d="M20 6L9 17l-5-5"
+                  style={{
+                    strokeDasharray: 24,
+                    strokeDashoffset: 24,
+                    animation: 'checkmark-draw 600ms 400ms ease-out forwards',
+                  }}
+                />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-foreground">Your Parenting Plan is Complete</h1>
+          </div>
+          <p className="text-gray-500 text-[15px] max-w-md leading-relaxed mb-8">
+            You did it — together. Your cooperation made this possible, and your children will benefit from the effort you&apos;ve both put in.
           </p>
 
-          {/* Action cards */}
-          <div className="w-full max-w-[480px] flex flex-col gap-3 mb-8">
+          {/* Next steps action cards */}
+          <div
+            className="w-full max-w-[480px] flex flex-col gap-3 mb-8"
+            style={{ animation: 'fade-in-up 500ms 600ms ease-out forwards', opacity: 0 }}
+          >
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider text-left mb-1">What&apos;s next</p>
+
             {/* Download PDF */}
             <button
               onClick={onDownloadPdf}
