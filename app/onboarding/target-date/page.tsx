@@ -66,7 +66,7 @@ export default function TargetDatePage() {
       <p className="text-gray-500 mb-8">When would you like to have your parenting plan complete? Setting a target helps you stay on track. You can always adjust this later.</p>
 
       {/* Preset Options */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
         {presets.map(({ days, label }) => {
           const isSelected = selectedPreset === days;
           const targetDate = addDays(days);
@@ -75,20 +75,22 @@ export default function TargetDatePage() {
             <button
               key={days}
               onClick={() => handlePresetSelect(days)}
-              className={`relative p-5 rounded-xl border-2 text-center transition-all ${
+              className={`relative p-4 sm:p-5 rounded-xl border-2 text-center sm:text-center flex sm:flex-col items-center sm:items-center justify-between sm:justify-center transition-all ${
                 isSelected
                   ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
                   : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
               }`}
             >
-              {isSelected && (
-                <CheckCircleIcon className="w-5 h-5 text-primary absolute top-3 right-3" />
-              )}
-              <div className={`text-2xl font-bold mb-1 ${isSelected ? 'text-primary' : 'text-gray-900'}`}>
+              <div className={`text-xl sm:text-2xl font-bold sm:mb-1 ${isSelected ? 'text-primary' : 'text-gray-900'}`}>
                 {label}
               </div>
-              <div className={`text-sm ${isSelected ? 'text-primary/70' : 'text-gray-500'}`}>
-                {formatDate(targetDate)}
+              <div className="flex items-center gap-2">
+                <div className={`text-sm ${isSelected ? 'text-primary/70' : 'text-gray-500'}`}>
+                  {formatDate(targetDate)}
+                </div>
+                {isSelected && (
+                  <CheckCircleIcon className="w-5 h-5 text-primary sm:absolute sm:top-3 sm:right-3" />
+                )}
               </div>
             </button>
           );
@@ -130,14 +132,14 @@ export default function TargetDatePage() {
       <div className="flex justify-between">
         <button
           onClick={handleBack}
-          className="px-6 py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
+          className="px-6 py-3.5 sm:py-3 border border-gray-300 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleComplete}
           disabled={!canComplete}
-          className="px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3.5 sm:py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Complete Onboarding
         </button>

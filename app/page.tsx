@@ -169,10 +169,10 @@ export default function Home() {
   // Mock parenting plan sections with new structure
   const mockSections: Section[] = [
     // Timesharing
-    { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '~20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
-    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'agreed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
     { id: 'weekday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekday Schedule', description: 'Define weekday schedule', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/weekday' },
+    { id: 'weekend-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Weekend Schedule', description: 'Plan weekend parenting time', state: 'agreed', estimatedTime: '~15 min', formUrl: '/forms/weekend', signatureStatus: { you: false, them: false } },
     { id: 'school-breaks', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'School Breaks & Vacations', description: 'Plan school breaks and summer', state: 'in-review' as SectionState, estimatedTime: '~20 min', formUrl: '/forms/breaks', draftedBy: 'them' as const, currentTurn: 'you' as const, draftData: { springBreak: 'Alternating years', winterBreak: 'Split evenly — first half with one parent, second half with other', summerBreak: 'Each parent gets two consecutive weeks' } },
+    { id: 'holiday-schedule', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Holiday Schedule', description: 'Define how holidays will be shared', state: 'signed', estimatedTime: '~20 min', formUrl: '/forms/holiday', signatureStatus: { you: true, them: true } },
     { id: 'transportation', moduleId: 'timesharing', moduleName: 'Timesharing Schedule', category: 'timesharing', title: 'Transportation & Exchange', description: 'Define pickup and dropoff', state: 'agreed', estimatedTime: '~10 min', formUrl: '/forms/transport', signatureStatus: { you: false, them: false } },
 
     // Decision-Making
@@ -186,6 +186,7 @@ export default function Home() {
     { id: 'information-sharing', moduleId: 'communication', moduleName: 'Communication', category: 'communication', title: 'Information Sharing', description: 'Sharing important updates', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/info-sharing' },
 
     // Other
+    { id: 'number-of-overnights', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Number of Overnights', description: 'Calculate annual overnight totals', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/overnights' },
     { id: 'relocation', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Relocation', description: 'Plans if either parent moves', state: 'not-started', estimatedTime: '~15 min', formUrl: '/forms/relocation' },
     { id: 'modifications', moduleId: 'other', moduleName: 'Final Considerations', category: 'other', title: 'Changes & Modifications', description: 'How to update this plan', state: 'not-started', estimatedTime: '~10 min', formUrl: '/forms/modifications' },
   ];

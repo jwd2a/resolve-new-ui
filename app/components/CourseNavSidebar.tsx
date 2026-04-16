@@ -24,16 +24,22 @@ interface CourseNavSidebarProps {
   onLessonClick?: (moduleId: string, lessonId: string) => void;
 }
 
-export default function CourseNavSidebar({ modules: initialModules, onLessonClick }: CourseNavSidebarProps) {
-  const [modules, setModules] = useState(initialModules);
+export default function CourseNavSidebar({ modules: propModules, onLessonClick }: CourseNavSidebarProps) {
+  const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>({});
 
   const toggleModule = (moduleId: string) => {
-    setModules(modules.map(module =>
-      module.id === moduleId
-        ? { ...module, expanded: !module.expanded }
-        : module
-    ));
+    setManualExpanded(prev => ({ ...prev, [moduleId]: !getExpanded(moduleId) }));
   };
+
+  const getExpanded = (moduleId: string) => {
+    if (moduleId in manualExpanded) return manualExpanded[moduleId];
+    return propModules.find(m => m.id === moduleId)?.expanded ?? false;
+  };
+
+  const modules = propModules.map(m => ({
+    ...m,
+    expanded: getExpanded(m.id),
+  }));
 
   return (
     <div className="w-64 bg-white border-r border-border h-full overflow-y-auto">

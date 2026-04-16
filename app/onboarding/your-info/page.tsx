@@ -51,13 +51,13 @@ export default function YourInfoPage() {
           onChange={(e) => updateData({ address: e.target.value })}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400 mb-4"
         />
-        <div className="grid grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-6 gap-4">
           <input
             type="text"
             placeholder="City"
             value={data.city}
             onChange={(e) => updateData({ city: e.target.value })}
-            className="col-span-3 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
+            className="col-span-2 sm:col-span-3 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
           />
           <input
             type="text"
@@ -71,7 +71,7 @@ export default function YourInfoPage() {
             placeholder="ZIP"
             value={data.zip}
             onChange={(e) => updateData({ zip: e.target.value })}
-            className="col-span-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
+            className="col-span-1 sm:col-span-2 w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary text-gray-900 placeholder-gray-400"
           />
         </div>
       </div>
@@ -103,7 +103,7 @@ export default function YourInfoPage() {
         <button
           onClick={handleContinue}
           disabled={!canContinue}
-          className="px-8 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto px-8 py-3.5 sm:py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Continue
         </button>

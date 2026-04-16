@@ -1,132 +1,50 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
-import { useRouter, useSearchParams } from 'next/navigation';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
-import LessonVideoContent from '@/app/components/LessonVideoContent';
-import HolidayScheduleForm from '@/app/components/HolidayScheduleForm';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 import ParentingPlanPreviewModal from '@/app/components/ParentingPlanPreviewModal';
+import { courseModules } from './data';
+import { useState } from 'react';
 
-function HolidayScheduleContent() {
+function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
 
-  // Check if remote session mode is enabled via query param
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
 
-  // Check flow type - default is 'inline', alternative is 'selection'
-  const flowType = searchParams.get('flow') || 'inline';
+  // Build sidebar modules with current/expanded derived from URL
+  const sidebarModules = courseModules.map((module) => {
+    const lessons = module.lessons.map((lesson) => ({
+      id: lesson.id,
+      number: lesson.number,
+      title: lesson.title,
+      completed: false,
+      current: pathname === lesson.href,
+    }));
 
-  const courseModules = [
-    {
-      id: 'module-1',
-      number: 1,
-      title: 'Welcome to Resolve',
-      lessons: [],
-      expanded: false,
-    },
-    {
-      id: 'module-2',
-      number: 2,
-      title: 'Parental Responsibility and Decision Making',
-      lessons: [],
-      expanded: false,
-    },
-    {
-      id: 'module-3',
-      number: 3,
-      title: 'Timesharing Schedule',
-      lessons: [
-        {
-          id: 'lesson-1',
-          number: 1,
-          title: 'Introduction to Time Sharing',
-          completed: true,
-        },
-        {
-          id: 'lesson-2',
-          number: 2,
-          title: 'Scheduling and Our Calendar',
-          completed: false,
-        },
-        {
-          id: 'lesson-3',
-          number: 3,
-          title: 'Weekday and Weekend Schedule',
-          completed: false,
-        },
-        {
-          id: 'lesson-4',
-          number: 4,
-          title: 'Holiday Schedule',
-          completed: false,
-          current: true,
-        },
-        {
-          id: 'lesson-5',
-          number: 5,
-          title: 'School Breaks',
-          completed: false,
-        },
-        {
-          id: 'lesson-6',
-          number: 6,
-          title: 'Transportation and Exchange',
-          completed: false,
-        },
-        {
-          id: 'lesson-7',
-          number: 7,
-          title: 'Other Travel Considerations',
-          completed: false,
-        },
-      ],
-      expanded: true,
-    },
-    {
-      id: 'module-4',
-      number: 4,
-      title: 'Educational Decisions',
-      lessons: [],
-      expanded: false,
-    },
-    {
-      id: 'module-5',
-      number: 5,
-      title: 'Final Considerations',
-      lessons: [],
-      expanded: false,
-    },
-  ];
+    const hasCurrentLesson = lessons.some((l) => l.current);
 
-  const keyPoints = [
-    'Plan ahead to ensure stress-free holiday transitions.',
-    'Be open to creating new traditions.',
-    'Give yourself permission to grieve or splitting holiday time.',
-    'Prioritize your child\'s joy over personal preferences.',
-    'If a holiday isn\'t important in your family, just use the normal schedule.',
-  ];
+    return {
+      id: module.id,
+      number: module.number,
+      title: module.title,
+      lessons,
+      expanded: hasCurrentLesson,
+    };
+  });
 
   const handleLessonClick = (moduleId: string, lessonId: string) => {
-    console.log('Navigate to:', moduleId, lessonId);
-    // In real app, this would navigate to the lesson
-  };
-
-  const handlePreviewPlan = () => {
-    setShowPreviewPanel(true);
-  };
-
-  const handleExitCourse = () => {
-    router.push('/');
+    router.push(`/course/${moduleId}/${lessonId}`);
   };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      {/* Remote Session Banner */}
       {isRemoteSessionActive && <RemoteSessionBanner participantCount={2} />}
 
       {/* Header */}
@@ -163,10 +81,8 @@ function HolidayScheduleContent() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
-        <CourseNavSidebar modules={courseModules} onLessonClick={handleLessonClick} />
+        <CourseNavSidebar modules={sidebarModules} onLessonClick={handleLessonClick} />
 
-        {/* Content Area */}
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-8">
             {/* Top Actions */}
@@ -181,14 +97,14 @@ function HolidayScheduleContent() {
 
               <div className="flex items-center space-x-3">
                 <button
-                  onClick={handlePreviewPlan}
+                  onClick={() => setShowPreviewPanel(true)}
                   className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/5 rounded-lg transition-colors"
                 >
                   <DocumentTextIcon className="w-5 h-5" />
                   <span>Preview Parenting Plan</span>
                 </button>
                 <button
-                  onClick={handleExitCourse}
+                  onClick={() => router.push('/')}
                   className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ArrowRightCircleIcon className="w-5 h-5" />
@@ -197,26 +113,11 @@ function HolidayScheduleContent() {
               </div>
             </div>
 
-            {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column - Video and Content */}
-              <div>
-                <LessonVideoContent
-                  title="Holiday Schedule"
-                  keyPoints={keyPoints}
-                />
-              </div>
-
-              {/* Right Column - Form */}
-              <div>
-                <HolidayScheduleForm flowType={flowType} />
-              </div>
-            </div>
+            {children}
           </div>
         </div>
       </div>
 
-      {/* Video Collaboration Controls */}
       {isRemoteSessionActive && (
         <VideoCollaborationControls
           onToggleMicrophone={() => console.log('Toggle microphone')}
@@ -225,20 +126,18 @@ function HolidayScheduleContent() {
         />
       )}
 
-      {/* Parenting Plan Preview Panel */}
       <ParentingPlanPreviewModal
         isOpen={showPreviewPanel}
         onClose={() => setShowPreviewPanel(false)}
-        currentSectionId="holiday-schedule"
       />
     </div>
   );
 }
 
-export default function HolidaySchedulePage() {
+export default function CourseLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
-      <HolidayScheduleContent />
+      <CourseLayoutInner>{children}</CourseLayoutInner>
     </Suspense>
   );
 }
