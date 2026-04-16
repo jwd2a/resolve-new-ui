@@ -23,6 +23,7 @@ export default function CourseCompletionOverlay({
 }: CourseCompletionOverlayProps) {
   const [isWaiting, setIsWaiting] = useState(true);
   const [isLeaving, setIsLeaving] = useState(false);
+  const [showGoodbye, setShowGoodbye] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
   // Fade in on mount
@@ -49,11 +50,15 @@ export default function CourseCompletionOverlay({
     }
   }, [coParentFinished, isWaiting]);
 
-  // Auto-navigate after leaving
+  // Staged goodbye transition: fade content out, then show goodbye after delay
   useEffect(() => {
     if (isLeaving) {
-      const timer = setTimeout(() => onViewPlan(), 3000);
-      return () => clearTimeout(timer);
+      const goodbyeTimer = setTimeout(() => setShowGoodbye(true), 800);
+      const navTimer = setTimeout(() => onViewPlan(), 4500);
+      return () => {
+        clearTimeout(goodbyeTimer);
+        clearTimeout(navTimer);
+      };
     }
   }, [isLeaving, onViewPlan]);
 
@@ -180,105 +185,103 @@ export default function CourseCompletionOverlay({
             </div>
           </div>
 
-          {/* Content area - swaps between celebration copy and goodbye copy */}
+          {/* Content area - staged transition from celebration to goodbye */}
           <div className="relative w-full max-w-[480px]">
-            {/* Celebration content - fades out when leaving */}
-            <div className={`transition-all duration-500 ${isLeaving ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0'}`}>
-              {!isLeaving && (
-                <>
-                  <h1 className="text-2xl font-bold text-foreground mb-2">Your Parenting Plan is Complete!</h1>
-                  <p className="text-gray-500 text-[15px] max-w-md leading-relaxed mb-8 mx-auto">
-                    You did it — together. Your cooperation made this possible, and your children will benefit from the effort you&apos;ve both put in.
-                  </p>
+            {/* Celebration content - fades out slowly when leaving */}
+            <div className={`transition-all duration-[800ms] ease-in-out ${isLeaving ? 'opacity-0 -translate-y-6 max-h-0 overflow-hidden' : 'opacity-100 translate-y-0 max-h-[800px]'}`}>
+              <h1 className="text-2xl font-bold text-foreground mb-2">Your Parenting Plan is Complete!</h1>
+              <p className="text-gray-500 text-[15px] max-w-md leading-relaxed mb-8 mx-auto">
+                You did it — together. Your cooperation made this possible, and your children will benefit from the effort you&apos;ve both put in.
+              </p>
 
-                  {/* Next steps action cards */}
-                  <div
-                    className="flex flex-col gap-3 mb-8"
-                    style={{ animation: 'fade-in-up 500ms 600ms ease-out forwards', opacity: 0 }}
-                  >
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider text-left mb-1">What&apos;s next</p>
+              {/* Next steps action cards */}
+              <div
+                className="flex flex-col gap-3 mb-8"
+                style={!isLeaving ? { animation: 'fade-in-up 500ms 600ms ease-out forwards', opacity: 0 } : undefined}
+              >
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider text-left mb-1">What&apos;s next</p>
 
-                    <button
-                      onClick={onDownloadPdf}
-                      className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
-                    >
-                      <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-foreground text-sm font-semibold">Download PDF</div>
-                        <div className="text-gray-500 text-xs">Save a copy for your records</div>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={onShareWithAttorney}
-                      className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
-                    >
-                      <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
-                          <polyline points="16 6 12 2 8 6" />
-                          <line x1="12" y1="2" x2="12" y2="15" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-foreground text-sm font-semibold">Share with Your Attorney</div>
-                        <div className="text-gray-500 text-xs">Have a professional review your plan</div>
-                      </div>
-                    </button>
-
-                    <button
-                      onClick={onSetReminder}
-                      className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
-                    >
-                      <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="3" y="4" width="18" height="18" rx="2" />
-                          <line x1="16" y1="2" x2="16" y2="6" />
-                          <line x1="8" y1="2" x2="8" y2="6" />
-                          <line x1="3" y1="10" x2="21" y2="10" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-foreground text-sm font-semibold">Set a Review Reminder</div>
-                        <div className="text-gray-500 text-xs">Revisit your plan in 6 months</div>
-                      </div>
-                    </button>
+                <button
+                  onClick={onDownloadPdf}
+                  className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3" />
+                    </svg>
                   </div>
+                  <div>
+                    <div className="text-foreground text-sm font-semibold">Download PDF</div>
+                    <div className="text-gray-500 text-xs">Save a copy for your records</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={onShareWithAttorney}
+                  className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                      <polyline points="16 6 12 2 8 6" />
+                      <line x1="12" y1="2" x2="12" y2="15" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-foreground text-sm font-semibold">Share with Your Attorney</div>
+                    <div className="text-gray-500 text-xs">Have a professional review your plan</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={onSetReminder}
+                  className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
+                >
+                  <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2" />
+                      <line x1="16" y1="2" x2="16" y2="6" />
+                      <line x1="8" y1="2" x2="8" y2="6" />
+                      <line x1="3" y1="10" x2="21" y2="10" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="text-foreground text-sm font-semibold">Set a Review Reminder</div>
+                    <div className="text-gray-500 text-xs">Revisit your plan in 6 months</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Goodbye content - fades in after celebration content has faded out */}
+            <div className={`transition-all duration-700 ease-out ${showGoodbye ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+              {showGoodbye && (
+                <>
+                  <h2 className="text-2xl font-bold text-foreground mb-2">Say goodbye!</h2>
+                  <p className="text-gray-500 text-[15px] max-w-sm leading-relaxed mx-auto mb-6">
+                    This will end your video call. Take a moment to say bye to your co-parent!
+                  </p>
+                  <p className="text-gray-400 text-sm mb-4">Redirecting to your parenting plan shortly...</p>
+                  <button
+                    onClick={onViewPlan}
+                    className="text-primary font-medium text-sm hover:underline transition-colors"
+                  >
+                    Go now
+                  </button>
                 </>
               )}
             </div>
-
-            {/* Goodbye content - fades in when leaving */}
-            {isLeaving && (
-              <div className="animate-[fade-in-up_500ms_ease-out_forwards]">
-                <h2 className="text-2xl font-bold text-foreground mb-2">Say goodbye!</h2>
-                <p className="text-gray-500 text-[15px] max-w-sm leading-relaxed mx-auto mb-6">
-                  This will end your video call. Take a moment to say bye to your co-parent!
-                </p>
-                <p className="text-gray-400 text-sm mb-4">Redirecting to your parenting plan shortly...</p>
-                <button
-                  onClick={onViewPlan}
-                  className="text-primary font-medium text-sm hover:underline transition-colors"
-                >
-                  Go now
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* View Plan button - always present, animates up when content fades */}
-          {!isLeaving && (
+          {/* View Plan button - fades out as goodbye appears */}
+          <div className={`transition-all duration-700 ease-in-out ${isLeaving ? 'opacity-0 -translate-y-4 pointer-events-none' : 'opacity-100 translate-y-0'}`}>
             <button
               onClick={handleLeave}
-              className="bg-primary text-white font-semibold text-[15px] px-8 py-3.5 rounded-xl shadow-md hover:bg-primary-dark transition-all"
+              className="bg-primary text-white font-semibold text-[15px] px-8 py-3.5 rounded-xl shadow-md hover:bg-primary-dark transition-colors"
             >
               View Your Parenting Plan &#10132;
             </button>
-          )}
+          </div>
         </div>
       )}
     </div>
