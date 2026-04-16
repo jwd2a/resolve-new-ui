@@ -36,7 +36,15 @@ export default function CourseCompletionOverlay({
     }
   }, [isOpen]);
 
-  // Skip waiting if co-parent already finished, or transition when they do
+  // Initialize state when overlay opens
+  useEffect(() => {
+    if (isOpen) {
+      setState(coParentFinished ? 'celebrating' : 'waiting');
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen]);
+
+  // Transition to celebrating when co-parent finishes
   useEffect(() => {
     if (coParentFinished && state === 'waiting') {
       setState('celebrating');
@@ -51,14 +59,6 @@ export default function CourseCompletionOverlay({
     }
     setShowContinueButton(false);
   }, [state]);
-
-  // Initialize state when overlay opens
-  useEffect(() => {
-    if (isOpen) {
-      setState(coParentFinished ? 'celebrating' : 'waiting');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -132,7 +132,6 @@ export default function CourseCompletionOverlay({
         </div>
       )}
 
-      {/* Celebrating and Next Steps states rendered in subsequent tasks */}
       {state === 'celebrating' && (
         <div
           className="flex flex-col items-center justify-center text-center px-6"
@@ -210,7 +209,7 @@ export default function CourseCompletionOverlay({
           <button
             onClick={() => setState('next-steps')}
             className={`bg-white text-primary font-semibold text-base px-9 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:bg-gray-50 transition-all duration-500 ${
-              showContinueButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+              showContinueButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
             }`}
           >
             Continue &#10132;
