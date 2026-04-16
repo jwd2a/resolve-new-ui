@@ -218,7 +218,88 @@ export default function CourseCompletionOverlay({
         </div>
       )}
       {state === 'next-steps' && (
-        <div className="text-white text-center">Next steps state — coming next</div>
+        <div
+          className="flex flex-col items-center justify-center text-center px-6 w-full"
+          style={{ animation: 'scale-in 400ms ease-out forwards' }}
+        >
+          <h2 className="text-[22px] font-bold text-white mb-1">What&apos;s Next</h2>
+          <p className="text-white/70 text-sm mb-6">Here&apos;s what you can do with your completed plan</p>
+
+          {/* Action cards */}
+          <div className="w-full max-w-[400px] flex flex-col gap-3 mb-6">
+            {/* Download PDF */}
+            <button
+              onClick={onDownloadPdf}
+              className="bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center gap-3.5 border border-white/15 hover:bg-white/15 transition-colors text-left"
+            >
+              <div className="w-10 h-10 bg-white/15 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-white text-sm font-semibold">Download PDF</div>
+                <div className="text-white/60 text-xs">Save a copy for your records</div>
+              </div>
+            </button>
+
+            {/* Share with Attorney */}
+            <button
+              onClick={onShareWithAttorney}
+              className="bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center gap-3.5 border border-white/15 hover:bg-white/15 transition-colors text-left"
+            >
+              <div className="w-10 h-10 bg-white/15 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
+                  <polyline points="16 6 12 2 8 6" />
+                  <line x1="12" y1="2" x2="12" y2="15" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-white text-sm font-semibold">Share with Your Attorney</div>
+                <div className="text-white/60 text-xs">Have a professional review your plan</div>
+              </div>
+            </button>
+
+            {/* Set Review Reminder */}
+            <button
+              onClick={onSetReminder}
+              className="bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center gap-3.5 border border-white/15 hover:bg-white/15 transition-colors text-left"
+            >
+              <div className="w-10 h-10 bg-white/15 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-white text-sm font-semibold">Set a Review Reminder</div>
+                <div className="text-white/60 text-xs">Revisit your plan in 6 months</div>
+              </div>
+            </button>
+          </div>
+
+          {/* Primary CTA */}
+          <button
+            onClick={onViewPlan}
+            className="bg-white text-primary font-semibold text-[15px] px-8 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:bg-gray-50 transition-colors"
+          >
+            View Your Parenting Plan &#10132;
+          </button>
+          <p className="text-white/40 text-xs mt-2.5">This will end the video session</p>
+
+          {/* Small video feeds in bottom-left */}
+          <div className="fixed bottom-4 left-4 flex gap-2">
+            <div className="w-20 h-14 bg-gray-900 rounded-lg border-2 border-white/20 overflow-hidden flex items-center justify-center">
+              <span className="text-white text-[10px]">You</span>
+            </div>
+            <div className="w-20 h-14 bg-gray-900 rounded-lg border-2 border-white/15 overflow-hidden flex items-center justify-center">
+              <span className="text-white text-[10px]">CP</span>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
