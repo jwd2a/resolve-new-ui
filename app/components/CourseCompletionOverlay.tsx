@@ -71,6 +71,28 @@ export default function CourseCompletionOverlay({
         background: 'linear-gradient(135deg, #4c1d95 0%, #5b21b6 40%, #7c3aed 100%)',
       }}
     >
+      {/* Animations */}
+      <style jsx>{`
+        @keyframes confetti-fall {
+          0% { transform: translateY(-10vh) rotate(0deg); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes checkmark-draw {
+          0% { stroke-dashoffset: 24; }
+          100% { stroke-dashoffset: 0; }
+        }
+        @keyframes scale-in {
+          0% { transform: scale(0.95); opacity: 0; }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes fade-in-up {
+          0% { transform: translateY(20px); opacity: 0; }
+          100% { transform: translateY(0); opacity: 1; }
+        }
+      `}</style>
+
       {/* Waiting State */}
       {state === 'waiting' && (
         <div className="flex flex-col items-center justify-center text-center px-6">
@@ -112,7 +134,88 @@ export default function CourseCompletionOverlay({
 
       {/* Celebrating and Next Steps states rendered in subsequent tasks */}
       {state === 'celebrating' && (
-        <div className="text-white text-center">Celebration state — coming next</div>
+        <div
+          className="flex flex-col items-center justify-center text-center px-6"
+          style={{ animation: 'scale-in 400ms ease-out forwards' }}
+        >
+          {/* Confetti dots */}
+          <div className="fixed inset-0 pointer-events-none overflow-hidden">
+            {[
+              { left: '10%', delay: '0s', duration: '3s', color: '#fbbf24', size: 8 },
+              { left: '20%', delay: '0.2s', duration: '3.2s', color: '#34d399', size: 6 },
+              { left: '30%', delay: '0.5s', duration: '2.8s', color: '#f472b6', size: 10 },
+              { left: '45%', delay: '0.1s', duration: '3.1s', color: '#60a5fa', size: 7 },
+              { left: '55%', delay: '0.4s', duration: '3s', color: '#a78bfa', size: 8 },
+              { left: '65%', delay: '0.3s', duration: '2.9s', color: '#fbbf24', size: 6 },
+              { left: '75%', delay: '0.6s', duration: '3.3s', color: '#34d399', size: 9 },
+              { left: '85%', delay: '0.2s', duration: '3s', color: '#f472b6', size: 7 },
+              { left: '15%', delay: '0.7s', duration: '3.1s', color: '#60a5fa', size: 5 },
+              { left: '50%', delay: '0.3s', duration: '2.7s', color: '#a78bfa', size: 8 },
+              { left: '40%', delay: '0.8s', duration: '3.4s', color: '#fbbf24', size: 6 },
+              { left: '90%', delay: '0.1s', duration: '3.2s', color: '#34d399', size: 7 },
+            ].map((dot, i) => (
+              <div
+                key={i}
+                className="absolute rounded-full"
+                style={{
+                  left: dot.left,
+                  top: '-10px',
+                  width: dot.size,
+                  height: dot.size,
+                  backgroundColor: dot.color,
+                  animation: `confetti-fall ${dot.duration} ${dot.delay} ease-in-out forwards`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Checkmark icon */}
+          <div className="w-20 h-20 rounded-full bg-white/15 flex items-center justify-center mb-6 backdrop-blur-sm">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path
+                d="M20 6L9 17l-5-5"
+                style={{
+                  strokeDasharray: 24,
+                  strokeDashoffset: 24,
+                  animation: 'checkmark-draw 600ms 400ms ease-out forwards',
+                }}
+              />
+            </svg>
+          </div>
+
+          {/* Text */}
+          <h1 className="text-[32px] font-bold text-white mb-3">Your Parenting Plan is Complete</h1>
+          <p className="text-white/85 text-[17px] max-w-[500px] leading-relaxed mb-9">
+            You&apos;ve both worked hard to create a thoughtful plan for your children. This is a meaningful step forward.
+          </p>
+
+          {/* Elevated video feeds */}
+          <div
+            className="flex gap-5 mb-9"
+            style={{ animation: 'fade-in-up 500ms 300ms ease-out forwards', opacity: 0 }}
+          >
+            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-white/30 overflow-hidden flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+              <div className="w-12 h-12 rounded-full bg-primary/40 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">You</span>
+              </div>
+            </div>
+            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-white/30 overflow-hidden flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+              <div className="w-12 h-12 rounded-full bg-gray-600/40 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">CP</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Continue button - fades in after 2 seconds */}
+          <button
+            onClick={() => setState('next-steps')}
+            className={`bg-white text-primary font-semibold text-base px-9 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:bg-gray-50 transition-all duration-500 ${
+              showContinueButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
+            }`}
+          >
+            Continue &#10132;
+          </button>
+        </div>
       )}
       {state === 'next-steps' && (
         <div className="text-white text-center">Next steps state — coming next</div>
