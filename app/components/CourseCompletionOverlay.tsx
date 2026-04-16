@@ -190,22 +190,7 @@ export default function CourseCompletionOverlay({
             </div>
           </div>
 
-          {/* Checkmark + heading */}
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path
-                  d="M20 6L9 17l-5-5"
-                  style={{
-                    strokeDasharray: 24,
-                    strokeDashoffset: 24,
-                    animation: 'checkmark-draw 600ms 400ms ease-out forwards',
-                  }}
-                />
-              </svg>
-            </div>
-            <h1 className="text-2xl font-bold text-foreground">Your Parenting Plan is Complete</h1>
-          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Your Parenting Plan is Complete!</h1>
           <p className="text-gray-500 text-[15px] max-w-md leading-relaxed mb-8">
             You did it — together. Your cooperation made this possible, and your children will benefit from the effort you&apos;ve both put in.
           </p>
