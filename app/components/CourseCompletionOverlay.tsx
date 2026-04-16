@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-type OverlayState = 'waiting' | 'celebrating' | 'next-steps';
+type OverlayState = 'waiting' | 'celebrating' | 'next-steps' | 'goodbye';
 
 interface CourseCompletionOverlayProps {
   isOpen: boolean;
@@ -60,16 +60,25 @@ export default function CourseCompletionOverlay({
     setShowContinueButton(false);
   }, [state]);
 
+  // Auto-navigate after goodbye state
+  useEffect(() => {
+    if (state === 'goodbye') {
+      const timer = setTimeout(() => onViewPlan(), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [state, onViewPlan]);
+
   if (!isOpen) return null;
+
+  const handleLeave = () => {
+    setState('goodbye');
+  };
 
   return (
     <div
-      className={`fixed inset-0 z-[60] flex items-center justify-center transition-opacity duration-[400ms] ${
+      className={`fixed inset-0 z-[60] flex items-center justify-center transition-opacity duration-[400ms] bg-white ${
         isVisible ? 'opacity-100' : 'opacity-0'
       }`}
-      style={{
-        background: 'linear-gradient(135deg, #4c1d95 0%, #5b21b6 40%, #7c3aed 100%)',
-      }}
     >
       {/* Animations */}
       <style jsx>{`
@@ -91,23 +100,28 @@ export default function CourseCompletionOverlay({
           0% { transform: translateY(20px); opacity: 0; }
           100% { transform: translateY(0); opacity: 1; }
         }
+        @keyframes wave {
+          0%, 100% { transform: rotate(0deg); }
+          25% { transform: rotate(20deg); }
+          75% { transform: rotate(-15deg); }
+        }
       `}</style>
 
       {/* Waiting State */}
       {state === 'waiting' && (
         <div className="flex flex-col items-center justify-center text-center px-6">
           {/* Pulsing clock icon */}
-          <div className="w-16 h-16 rounded-full border-[3px] border-white/30 flex items-center justify-center mb-6 animate-pulse">
-            <div className="w-12 h-12 rounded-full border-[3px] border-white/60 flex items-center justify-center">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round">
+          <div className="w-16 h-16 rounded-full border-[3px] border-primary/20 flex items-center justify-center mb-6 animate-pulse">
+            <div className="w-12 h-12 rounded-full border-[3px] border-primary/40 flex items-center justify-center">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round">
                 <path d="M12 6v6l4 2" />
                 <circle cx="12" cy="12" r="10" />
               </svg>
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-white mb-2">Almost there!</h2>
-          <p className="text-white/80 text-[15px] mb-8 max-w-xs leading-relaxed">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Almost there!</h2>
+          <p className="text-gray-500 text-[15px] mb-8 max-w-xs leading-relaxed">
             Waiting for {coParentName} to click Finish...
           </p>
 
@@ -121,17 +135,18 @@ export default function CourseCompletionOverlay({
               </div>
             </div>
             {/* Co-parent feed - neutral border */}
-            <div className="w-[140px] h-[100px] bg-gray-900 rounded-xl border-[3px] border-white/20 overflow-hidden flex items-center justify-center">
+            <div className="w-[140px] h-[100px] bg-gray-900 rounded-xl border-[3px] border-gray-300 overflow-hidden flex items-center justify-center">
               <div className="w-10 h-10 rounded-full bg-gray-600/40 flex items-center justify-center">
                 <span className="text-white text-xs font-semibold">CP</span>
               </div>
             </div>
           </div>
 
-          <p className="text-white/50 text-[13px]">You can still talk while you wait</p>
+          <p className="text-gray-400 text-[13px]">You can still talk while you wait</p>
         </div>
       )}
 
+      {/* Celebrating State */}
       {state === 'celebrating' && (
         <div
           className="flex flex-col items-center justify-center text-center px-6"
@@ -140,18 +155,18 @@ export default function CourseCompletionOverlay({
           {/* Confetti dots */}
           <div className="fixed inset-0 pointer-events-none overflow-hidden">
             {[
-              { left: '10%', delay: '0s', duration: '3s', color: '#fbbf24', size: 8 },
-              { left: '20%', delay: '0.2s', duration: '3.2s', color: '#34d399', size: 6 },
-              { left: '30%', delay: '0.5s', duration: '2.8s', color: '#f472b6', size: 10 },
-              { left: '45%', delay: '0.1s', duration: '3.1s', color: '#60a5fa', size: 7 },
-              { left: '55%', delay: '0.4s', duration: '3s', color: '#a78bfa', size: 8 },
-              { left: '65%', delay: '0.3s', duration: '2.9s', color: '#fbbf24', size: 6 },
-              { left: '75%', delay: '0.6s', duration: '3.3s', color: '#34d399', size: 9 },
-              { left: '85%', delay: '0.2s', duration: '3s', color: '#f472b6', size: 7 },
-              { left: '15%', delay: '0.7s', duration: '3.1s', color: '#60a5fa', size: 5 },
-              { left: '50%', delay: '0.3s', duration: '2.7s', color: '#a78bfa', size: 8 },
-              { left: '40%', delay: '0.8s', duration: '3.4s', color: '#fbbf24', size: 6 },
-              { left: '90%', delay: '0.1s', duration: '3.2s', color: '#34d399', size: 7 },
+              { left: '10%', delay: '0s', duration: '3s', color: '#5b21b6', size: 8 },
+              { left: '20%', delay: '0.2s', duration: '3.2s', color: '#7c3aed', size: 6 },
+              { left: '30%', delay: '0.5s', duration: '2.8s', color: '#a78bfa', size: 10 },
+              { left: '45%', delay: '0.1s', duration: '3.1s', color: '#10b981', size: 7 },
+              { left: '55%', delay: '0.4s', duration: '3s', color: '#5b21b6', size: 8 },
+              { left: '65%', delay: '0.3s', duration: '2.9s', color: '#7c3aed', size: 6 },
+              { left: '75%', delay: '0.6s', duration: '3.3s', color: '#a78bfa', size: 9 },
+              { left: '85%', delay: '0.2s', duration: '3s', color: '#10b981', size: 7 },
+              { left: '15%', delay: '0.7s', duration: '3.1s', color: '#5b21b6', size: 5 },
+              { left: '50%', delay: '0.3s', duration: '2.7s', color: '#7c3aed', size: 8 },
+              { left: '40%', delay: '0.8s', duration: '3.4s', color: '#a78bfa', size: 6 },
+              { left: '90%', delay: '0.1s', duration: '3.2s', color: '#10b981', size: 7 },
             ].map((dot, i) => (
               <div
                 key={i}
@@ -169,8 +184,8 @@ export default function CourseCompletionOverlay({
           </div>
 
           {/* Checkmark icon */}
-          <div className="w-20 h-20 rounded-full bg-white/15 flex items-center justify-center mb-6 backdrop-blur-sm">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path
                 d="M20 6L9 17l-5-5"
                 style={{
@@ -183,9 +198,9 @@ export default function CourseCompletionOverlay({
           </div>
 
           {/* Text */}
-          <h1 className="text-[32px] font-bold text-white mb-3">Your Parenting Plan is Complete</h1>
-          <p className="text-white/85 text-[17px] max-w-[500px] leading-relaxed mb-9">
-            You&apos;ve both worked hard to create a thoughtful plan for your children. This is a meaningful step forward.
+          <h1 className="text-[32px] font-bold text-foreground mb-3">Your Parenting Plan is Complete</h1>
+          <p className="text-gray-600 text-[17px] max-w-[500px] leading-relaxed mb-9">
+            You did it — together. This plan is the result of real cooperation, and your children will benefit from the effort you&apos;ve both put in.
           </p>
 
           {/* Elevated video feeds */}
@@ -193,12 +208,12 @@ export default function CourseCompletionOverlay({
             className="flex gap-5 mb-9"
             style={{ animation: 'fade-in-up 500ms 300ms ease-out forwards', opacity: 0 }}
           >
-            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-white/30 overflow-hidden flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-primary/30 overflow-hidden flex items-center justify-center shadow-lg">
               <div className="w-12 h-12 rounded-full bg-primary/40 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">You</span>
               </div>
             </div>
-            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-white/30 overflow-hidden flex items-center justify-center shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-primary/30 overflow-hidden flex items-center justify-center shadow-lg">
               <div className="w-12 h-12 rounded-full bg-gray-600/40 flex items-center justify-center">
                 <span className="text-white text-sm font-semibold">CP</span>
               </div>
@@ -208,7 +223,7 @@ export default function CourseCompletionOverlay({
           {/* Continue button - fades in after 2 seconds */}
           <button
             onClick={() => setState('next-steps')}
-            className={`bg-white text-primary font-semibold text-base px-9 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:bg-gray-50 transition-all duration-500 ${
+            className={`bg-primary text-white font-semibold text-base px-9 py-3.5 rounded-xl shadow-md hover:bg-primary-dark transition-all duration-500 ${
               showContinueButton ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
             }`}
           >
@@ -216,57 +231,75 @@ export default function CourseCompletionOverlay({
           </button>
         </div>
       )}
+
+      {/* Next Steps State */}
       {state === 'next-steps' && (
         <div
-          className="flex flex-col items-center justify-center text-center px-6 w-full"
+          className="flex flex-col items-center text-center px-6 w-full overflow-y-auto max-h-full py-12"
           style={{ animation: 'scale-in 400ms ease-out forwards' }}
         >
-          <h2 className="text-[22px] font-bold text-white mb-1">What&apos;s Next</h2>
-          <p className="text-white/70 text-sm mb-6">Here&apos;s what you can do with your completed plan</p>
+          {/* Large video feeds - the celebration is about THEM */}
+          <div className="flex gap-6 mb-8">
+            <div className="w-[240px] h-[170px] bg-gray-900 rounded-2xl border-[3px] border-primary/20 overflow-hidden flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-primary/40 flex items-center justify-center">
+                <span className="text-white text-base font-semibold">You</span>
+              </div>
+            </div>
+            <div className="w-[240px] h-[170px] bg-gray-900 rounded-2xl border-[3px] border-primary/20 overflow-hidden flex items-center justify-center shadow-lg">
+              <div className="w-14 h-14 rounded-full bg-gray-600/40 flex items-center justify-center">
+                <span className="text-white text-base font-semibold">CP</span>
+              </div>
+            </div>
+          </div>
+
+          <h2 className="text-2xl font-bold text-foreground mb-1">Great work, both of you</h2>
+          <p className="text-gray-500 text-sm mb-8 max-w-md">
+            Your cooperation made this possible. Here are some things you can do with your completed plan.
+          </p>
 
           {/* Action cards */}
-          <div className="w-full max-w-[400px] flex flex-col gap-3 mb-6">
+          <div className="w-full max-w-[480px] flex flex-col gap-3 mb-8">
             {/* Download PDF */}
             <button
               onClick={onDownloadPdf}
-              className="bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center gap-3.5 border border-white/15 hover:bg-white/15 transition-colors text-left"
+              className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
             >
-              <div className="w-10 h-10 bg-white/15 rounded-[10px] flex items-center justify-center flex-shrink-0">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M12 10v6m0 0l-3-3m3 3l3-3M3 17v3a1 1 0 001 1h16a1 1 0 001-1v-3" />
                 </svg>
               </div>
               <div>
-                <div className="text-white text-sm font-semibold">Download PDF</div>
-                <div className="text-white/60 text-xs">Save a copy for your records</div>
+                <div className="text-foreground text-sm font-semibold">Download PDF</div>
+                <div className="text-gray-500 text-xs">Save a copy for your records</div>
               </div>
             </button>
 
             {/* Share with Attorney */}
             <button
               onClick={onShareWithAttorney}
-              className="bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center gap-3.5 border border-white/15 hover:bg-white/15 transition-colors text-left"
+              className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
             >
-              <div className="w-10 h-10 bg-white/15 rounded-[10px] flex items-center justify-center flex-shrink-0">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8" />
                   <polyline points="16 6 12 2 8 6" />
                   <line x1="12" y1="2" x2="12" y2="15" />
                 </svg>
               </div>
               <div>
-                <div className="text-white text-sm font-semibold">Share with Your Attorney</div>
-                <div className="text-white/60 text-xs">Have a professional review your plan</div>
+                <div className="text-foreground text-sm font-semibold">Share with Your Attorney</div>
+                <div className="text-gray-500 text-xs">Have a professional review your plan</div>
               </div>
             </button>
 
             {/* Set Review Reminder */}
             <button
               onClick={onSetReminder}
-              className="bg-white/10 backdrop-blur-lg rounded-xl p-4 flex items-center gap-3.5 border border-white/15 hover:bg-white/15 transition-colors text-left"
+              className="bg-gray-50 rounded-xl p-4 flex items-center gap-3.5 border border-border hover:bg-gray-100 transition-colors text-left"
             >
-              <div className="w-10 h-10 bg-white/15 rounded-[10px] flex items-center justify-center flex-shrink-0">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <div className="w-10 h-10 bg-primary/10 rounded-[10px] flex items-center justify-center flex-shrink-0">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5b21b6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="4" width="18" height="18" rx="2" />
                   <line x1="16" y1="2" x2="16" y2="6" />
                   <line x1="8" y1="2" x2="8" y2="6" />
@@ -274,30 +307,64 @@ export default function CourseCompletionOverlay({
                 </svg>
               </div>
               <div>
-                <div className="text-white text-sm font-semibold">Set a Review Reminder</div>
-                <div className="text-white/60 text-xs">Revisit your plan in 6 months</div>
+                <div className="text-foreground text-sm font-semibold">Set a Review Reminder</div>
+                <div className="text-gray-500 text-xs">Revisit your plan in 6 months</div>
               </div>
             </button>
           </div>
 
           {/* Primary CTA */}
           <button
-            onClick={onViewPlan}
-            className="bg-white text-primary font-semibold text-[15px] px-8 py-3.5 rounded-xl shadow-[0_4px_16px_rgba(0,0,0,0.2)] hover:bg-gray-50 transition-colors"
+            onClick={handleLeave}
+            className="bg-primary text-white font-semibold text-[15px] px-8 py-3.5 rounded-xl shadow-md hover:bg-primary-dark transition-colors"
           >
             View Your Parenting Plan &#10132;
           </button>
-          <p className="text-white/40 text-xs mt-2.5">This will end the video session</p>
+        </div>
+      )}
 
-          {/* Small video feeds in bottom-left */}
-          <div className="fixed bottom-4 left-4 flex gap-2">
-            <div className="w-20 h-14 bg-gray-900 rounded-lg border-2 border-white/20 overflow-hidden flex items-center justify-center">
-              <span className="text-white text-[10px]">You</span>
+      {/* Goodbye State */}
+      {state === 'goodbye' && (
+        <div
+          className="flex flex-col items-center justify-center text-center px-6"
+          style={{ animation: 'scale-in 300ms ease-out forwards' }}
+        >
+          {/* Waving hand */}
+          <div
+            className="text-6xl mb-6"
+            style={{ animation: 'wave 0.8s ease-in-out 2', transformOrigin: '70% 70%' }}
+          >
+            <span role="img" aria-label="wave">&#128075;</span>
+          </div>
+
+          <h2 className="text-2xl font-bold text-foreground mb-2">Say goodbye!</h2>
+          <p className="text-gray-500 text-[15px] max-w-sm leading-relaxed mb-8">
+            This will end your video call. Take a moment to say bye to your co-parent!
+          </p>
+
+          {/* Video feeds so they can see each other */}
+          <div className="flex gap-5 mb-8">
+            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-primary/20 overflow-hidden flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-full bg-primary/40 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">You</span>
+              </div>
             </div>
-            <div className="w-20 h-14 bg-gray-900 rounded-lg border-2 border-white/15 overflow-hidden flex items-center justify-center">
-              <span className="text-white text-[10px]">CP</span>
+            <div className="w-[180px] h-[130px] bg-gray-900 rounded-2xl border-[3px] border-primary/20 overflow-hidden flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-full bg-gray-600/40 flex items-center justify-center">
+                <span className="text-white text-sm font-semibold">CP</span>
+              </div>
             </div>
           </div>
+
+          {/* Countdown hint */}
+          <p className="text-gray-400 text-sm mb-4">Redirecting to your parenting plan shortly...</p>
+
+          <button
+            onClick={onViewPlan}
+            className="text-primary font-medium text-sm hover:underline transition-colors"
+          >
+            Go now
+          </button>
         </div>
       )}
     </div>
