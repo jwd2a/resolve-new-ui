@@ -120,9 +120,6 @@ export default function CourseConclusionPage() {
         coParentFinished={coParentFinished}
         coParentName="your co-parent"
         onViewPlan={handleViewPlan}
-        onDownloadPdf={() => console.log('Download PDF')}
-        onShareWithAttorney={() => console.log('Share with attorney')}
-        onSetReminder={() => console.log('Set reminder')}
       />
     </>
   );
