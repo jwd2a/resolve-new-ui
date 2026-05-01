@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { DocumentTextIcon, UserGroupIcon, CreditCardIcon } from '@heroicons/react/24/outline';
 import { DocumentTextIcon as DocumentTextSolidIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
 import { STORAGE_KEY as ONBOARDING_STORAGE_KEY } from './onboarding/OnboardingContext';
+import AppNav from './components/AppNav';
 import ParentingPlanPreviewModal from './components/ParentingPlanPreviewModal';
 import ParentingPlanProgress from './components/ParentingPlanProgress';
 import SessionPrompt from './components/SessionPrompt';
@@ -246,78 +247,27 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">R</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900">Resolve</span>
-              </div>
-              {!isOnboarding && (
-                <nav className="flex space-x-1 items-center">
-                  <a href="/" className="px-4 py-2 text-sm font-medium text-primary bg-primary/5 rounded-lg">
-                    Dashboard
-                  </a>
-                  <a href="/course" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    Course
-                  </a>
-                  <a href="/parenting-plan" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    Parenting Plan
-                  </a>
-                  <a href="/family-info" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                    Family Info
-                  </a>
-                  {isFloridaTrack && (
-                    <>
-                      <span className="mx-2 h-5 w-px bg-gray-200" aria-hidden />
-                      <a
-                        href="/course/resources"
-                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        Resources
-                      </a>
-                      <a
-                        href="/exam"
-                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                      >
-                        Final Exam
-                      </a>
-                    </>
-                  )}
-                  <button
-                    onClick={() => setShowPreviewModal(true)}
-                    className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-2"
-                  >
-                    <DocumentTextIcon className="w-4 h-4" />
-                    <span>Preview Plan</span>
-                  </button>
-                </nav>
-              )}
-            </div>
-
-            <div className="flex items-center space-x-4">
-              {!isOnboarding && !isProposed && userData.coParentOnline && (
-                <div className="flex items-center space-x-2">
+      <AppNav
+        rightExtras={
+          !isOnboarding ? (
+            <>
+              {!isProposed && userData.coParentOnline && (
+                <div className="hidden md:flex items-center space-x-2 mr-2">
                   <div className="w-2 h-2 bg-success rounded-full" />
                   <span className="text-sm text-gray-700">{userData.coParentName} is online</span>
                 </div>
               )}
-              <button className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-semibold text-sm">
-                SD
+              <button
+                onClick={() => setShowPreviewModal(true)}
+                className="hidden md:flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+              >
+                <DocumentTextIcon className="w-4 h-4" />
+                <span>Preview Plan</span>
               </button>
-              {!isOnboarding && (
-                <div className="px-3 py-1 bg-gray-100 rounded-lg text-xs text-gray-600">
-                  MD
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
+            </>
+          ) : null
+        }
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">

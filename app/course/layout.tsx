@@ -2,12 +2,13 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
+import AppNav from '@/app/components/AppNav';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 import ParentingPlanPreviewModal from '@/app/components/ParentingPlanPreviewModal';
-import { getVisibleModules, getAllVisibleLessonIds } from './data';
+import { getVisibleModules } from './data';
 import { CourseProgressProvider, useCourseProgress } from './CourseProgressContext';
 import { OnboardingProvider, useOnboarding } from '@/app/onboarding/OnboardingContext';
 
@@ -22,10 +23,6 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   const isFlorida = data.floridaTrack;
 
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
-
-  const examUnlocked = isFlorida
-    ? getAllVisibleLessonIds(true).every((id) => completedLessons.has(id))
-    : false;
 
   // Build sidebar modules with current/expanded derived from URL.
   // getVisibleModules() already strips Florida-only lessons for non-Florida users.
@@ -56,82 +53,7 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {isRemoteSessionActive && <RemoteSessionBanner participantCount={2} />}
-
-      {/* Header */}
-      <header className="bg-white border-b border-border">
-        <div className="max-w-full mx-auto px-6">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-8">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">R</span>
-                </div>
-                <span className="text-xl font-semibold text-foreground">Resolve</span>
-              </div>
-              <nav className="hidden md:flex space-x-1 items-center">
-                <a href="/" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
-                  HOME
-                </a>
-                <a
-                  href="/course"
-                  className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                    pathname.startsWith('/course') &&
-                    pathname !== '/course/resources' &&
-                    pathname !== '/exam'
-                      ? 'text-primary bg-primary/5'
-                      : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
-                  }`}
-                >
-                  COURSE
-                </a>
-                <a href="/parenting-plan" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
-                  PARENTING PLAN
-                </a>
-                {isFlorida && (
-                  <>
-                    <span className="mx-2 h-5 w-px bg-gray-200" aria-hidden />
-                    <a
-                      href="/course/resources"
-                      className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                        pathname === '/course/resources'
-                          ? 'text-primary bg-primary/5'
-                          : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
-                      }`}
-                    >
-                      RESOURCES
-                    </a>
-                    {examUnlocked ? (
-                      <a
-                        href="/exam"
-                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                          pathname === '/exam'
-                            ? 'text-primary bg-primary/5'
-                            : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
-                        }`}
-                      >
-                        FINAL EXAM
-                      </a>
-                    ) : (
-                      <span
-                        title="Finish all lessons to unlock"
-                        className="px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed inline-flex items-center gap-1"
-                      >
-                        FINAL EXAM
-                        <LockClosedIcon className="w-3.5 h-3.5" />
-                      </span>
-                    )}
-                  </>
-                )}
-              </nav>
-            </div>
-            <button className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center">
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
+      <AppNav />
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
