@@ -1,14 +1,15 @@
 'use client';
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 import ParentingPlanPreviewModal from '@/app/components/ParentingPlanPreviewModal';
-import { courseModules } from './data';
-import { useState } from 'react';
+import { getVisibleModules } from './data';
+import { CourseProgressProvider, useCourseProgress } from './CourseProgressContext';
+import { OnboardingProvider, useOnboarding } from '@/app/onboarding/OnboardingContext';
 
 function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -16,15 +17,20 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
 
+  const { data } = useOnboarding();
+  const { completedLessons } = useCourseProgress();
+  const isFlorida = data.floridaTrack;
+
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
 
-  // Build sidebar modules with current/expanded derived from URL
-  const sidebarModules = courseModules.map((module) => {
+  // Build sidebar modules with current/expanded derived from URL.
+  // getVisibleModules() already strips Florida-only lessons for non-Florida users.
+  const sidebarModules = getVisibleModules(isFlorida).map((module) => {
     const lessons = module.lessons.map((lesson) => ({
       id: lesson.id,
       number: lesson.number,
       title: lesson.title,
-      completed: false,
+      completed: completedLessons.has(`${module.id}/${lesson.id}`),
       current: pathname === lesson.href,
     }));
 
@@ -137,7 +143,11 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
 export default function CourseLayout({ children }: { children: React.ReactNode }) {
   return (
     <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
-      <CourseLayoutInner>{children}</CourseLayoutInner>
+      <OnboardingProvider>
+        <CourseProgressProvider>
+          <CourseLayoutInner>{children}</CourseLayoutInner>
+        </CourseProgressProvider>
+      </OnboardingProvider>
     </Suspense>
   );
 }
