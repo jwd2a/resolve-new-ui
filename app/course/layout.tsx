@@ -7,7 +7,7 @@ import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
 import ParentingPlanPreviewModal from '@/app/components/ParentingPlanPreviewModal';
-import { getVisibleModules } from './data';
+import { getVisibleModules, getAllVisibleLessonIds } from './data';
 import { CourseProgressProvider, useCourseProgress } from './CourseProgressContext';
 import { OnboardingProvider, useOnboarding } from '@/app/onboarding/OnboardingContext';
 
@@ -18,7 +18,7 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
 
   const { data } = useOnboarding();
-  const { completedLessons } = useCourseProgress();
+  const { completedLessons, examPassed } = useCourseProgress();
   const isFlorida = data.floridaTrack;
 
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
@@ -87,7 +87,23 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        <CourseNavSidebar modules={sidebarModules} onLessonClick={handleLessonClick} />
+        <CourseNavSidebar
+          modules={sidebarModules}
+          onLessonClick={handleLessonClick}
+          floridaFooter={
+            isFlorida
+              ? {
+                  examUnlocked: getAllVisibleLessonIds(true).every((id) => completedLessons.has(id)),
+                  examPassed,
+                  resourcesHref: '/course/resources',
+                  examHref: '/course/exam',
+                  certificateHref: '/course/certificate',
+                  currentPath: pathname,
+                  onNavigate: (href) => router.push(href),
+                }
+              : null
+          }
+        />
 
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-8">
