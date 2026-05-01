@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { DocumentTextIcon, UserGroupIcon, CreditCardIcon } from '@heroicons/react/24/outline';
-import { DocumentTextIcon as DocumentTextSolidIcon } from '@heroicons/react/24/solid';
+import { DocumentTextIcon as DocumentTextSolidIcon, ShieldCheckIcon } from '@heroicons/react/24/solid';
+import { STORAGE_KEY as ONBOARDING_STORAGE_KEY } from './onboarding/OnboardingContext';
 import ParentingPlanPreviewModal from './components/ParentingPlanPreviewModal';
 import ParentingPlanProgress from './components/ParentingPlanProgress';
 import SessionPrompt from './components/SessionPrompt';
@@ -30,6 +31,19 @@ export default function Home() {
     waiverStatus: { you: false, them: false },
     paymentStatus: { you: false, them: false },
   });
+  const [isFloridaTrack, setIsFloridaTrack] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(ONBOARDING_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { floridaTrack?: boolean };
+        setIsFloridaTrack(!!parsed.floridaTrack);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
 
   // Check for query params
   useEffect(() => {
@@ -244,7 +258,7 @@ export default function Home() {
                 <span className="text-xl font-bold text-gray-900">Resolve</span>
               </div>
               {!isOnboarding && (
-                <nav className="flex space-x-1">
+                <nav className="flex space-x-1 items-center">
                   <a href="/" className="px-4 py-2 text-sm font-medium text-primary bg-primary/5 rounded-lg">
                     Dashboard
                   </a>
@@ -257,6 +271,23 @@ export default function Home() {
                   <a href="/family-info" className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
                     Family Info
                   </a>
+                  {isFloridaTrack && (
+                    <>
+                      <span className="mx-2 h-5 w-px bg-gray-200" aria-hidden />
+                      <a
+                        href="/course/resources"
+                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        Resources
+                      </a>
+                      <a
+                        href="/course/exam"
+                        className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      >
+                        Final Exam
+                      </a>
+                    </>
+                  )}
                   <button
                     onClick={() => setShowPreviewModal(true)}
                     className="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors flex items-center space-x-2"
@@ -290,6 +321,21 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
+        {isFloridaTrack && !isOnboarding && (
+          <div className="mb-6 bg-primary/5 border border-primary/20 rounded-xl p-4 flex items-start gap-3">
+            <ShieldCheckIcon className="w-6 h-6 text-primary flex-shrink-0 mt-0.5" />
+            <div>
+              <div className="text-sm font-semibold text-gray-900">
+                Enrolled in the Florida-Approved Parent Education Course
+              </div>
+              <p className="text-sm text-gray-600 mt-0.5 leading-relaxed">
+                You&apos;re completing the Florida Department of Children and Families approved
+                Parent Education and Family Stabilization Course. Finish all lessons and pass the
+                final exam to receive your certificate of completion.
+              </p>
+            </div>
+          </div>
+        )}
         {isOnboarding ? (
           /* Onboarding State */
           showCoursePreview ? (
