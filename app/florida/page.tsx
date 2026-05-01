@@ -2,33 +2,15 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { STORAGE_KEY } from '@/app/onboarding/OnboardingContext';
 
 export default function FloridaSignupEntry() {
   const router = useRouter();
 
   useEffect(() => {
-    // Mirror what the production app would do: flip the admin-only Florida
-    // bit on the new user record before sending them into onboarding. In
-    // the prototype this lives in localStorage so OnboardingContext picks
-    // it up via its lazy useState initializer on the next mount. The write
-    // must complete before router.replace fires (it does — both are sync).
-    let existing: Record<string, unknown> = {};
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) existing = JSON.parse(raw);
-    } catch {
-      // corrupted blob — start fresh so the Florida flag still lands
-    }
-    try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ ...existing, floridaTrack: true, jurisdictionState: 'Florida' }),
-      );
-    } catch {
-      // ignore quota / private mode
-    }
-    router.replace('/onboarding/your-info');
+    // Distribution-channel landing for the Florida-approved course.
+    // The actual flag is set on signup, so just route there with the
+    // florida query param. The flag is not user-modifiable thereafter.
+    router.replace('/signup?florida=true');
   }, [router]);
 
   return (
