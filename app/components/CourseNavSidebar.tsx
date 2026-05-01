@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon, LockClosedIcon } from '@heroicons/react/24/solid';
+import { CheckCircleIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 
 interface Lesson {
@@ -19,53 +19,12 @@ interface Module {
   expanded?: boolean;
 }
 
-export interface FloridaSidebarFooter {
-  examUnlocked: boolean;
-  examPassed: boolean;
-  resourcesHref: string;
-  examHref: string;
-  certificateHref: string;
-  currentPath: string;
-  onNavigate: (href: string) => void;
-}
-
 interface CourseNavSidebarProps {
   modules: Module[];
   onLessonClick?: (moduleId: string, lessonId: string) => void;
-  floridaFooter?: FloridaSidebarFooter | null;
 }
 
-function SidebarFooterLink({
-  label,
-  active,
-  locked = false,
-  onClick,
-}: {
-  label: string;
-  href: string;
-  active: boolean;
-  locked?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      disabled={locked}
-      className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left text-sm transition-colors ${
-        active
-          ? 'bg-primary/5 text-primary font-medium'
-          : locked
-          ? 'text-gray-400 cursor-not-allowed'
-          : 'text-gray-700 hover:bg-gray-50'
-      }`}
-    >
-      <span>{label}</span>
-      {locked && <LockClosedIcon className="w-3.5 h-3.5" />}
-    </button>
-  );
-}
-
-export default function CourseNavSidebar({ modules: propModules, onLessonClick, floridaFooter }: CourseNavSidebarProps) {
+export default function CourseNavSidebar({ modules: propModules, onLessonClick }: CourseNavSidebarProps) {
   const [manualExpanded, setManualExpanded] = useState<Record<string, boolean>>({});
 
   const toggleModule = (moduleId: string) => {
@@ -134,34 +93,6 @@ export default function CourseNavSidebar({ modules: propModules, onLessonClick, 
             )}
           </div>
         ))}
-
-        {floridaFooter && (
-          <div className="mt-6 pt-4 border-t border-gray-200 space-y-1">
-            <div className="px-3 text-[11px] uppercase tracking-wider text-gray-500 font-semibold mb-1">
-              Florida Requirements
-            </div>
-            <SidebarFooterLink
-              label="Resources"
-              href={floridaFooter.resourcesHref}
-              active={floridaFooter.currentPath === floridaFooter.resourcesHref}
-              onClick={() => floridaFooter.onNavigate(floridaFooter.resourcesHref)}
-            />
-            <SidebarFooterLink
-              label="Final Exam"
-              href={floridaFooter.examHref}
-              active={floridaFooter.currentPath === floridaFooter.examHref}
-              locked={!floridaFooter.examUnlocked}
-              onClick={() => floridaFooter.examUnlocked && floridaFooter.onNavigate(floridaFooter.examHref)}
-            />
-            <SidebarFooterLink
-              label="Certificate"
-              href={floridaFooter.certificateHref}
-              active={floridaFooter.currentPath === floridaFooter.certificateHref}
-              locked={!floridaFooter.examPassed}
-              onClick={() => floridaFooter.examPassed && floridaFooter.onNavigate(floridaFooter.certificateHref)}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

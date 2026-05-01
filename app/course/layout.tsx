@@ -2,7 +2,7 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Suspense, useState } from 'react';
-import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon } from '@heroicons/react/24/outline';
+import { ArrowLeftIcon, DocumentTextIcon, ArrowRightCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
 import CourseNavSidebar from '@/app/components/CourseNavSidebar';
 import RemoteSessionBanner from '@/app/components/RemoteSessionBanner';
 import VideoCollaborationControls from '@/app/components/VideoCollaborationControls';
@@ -18,10 +18,14 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
   const [showPreviewPanel, setShowPreviewPanel] = useState(false);
 
   const { data } = useOnboarding();
-  const { completedLessons, examPassed } = useCourseProgress();
+  const { completedLessons } = useCourseProgress();
   const isFlorida = data.floridaTrack;
 
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
+
+  const examUnlocked = isFlorida
+    ? getAllVisibleLessonIds(true).every((id) => completedLessons.has(id))
+    : false;
 
   // Build sidebar modules with current/expanded derived from URL.
   // getVisibleModules() already strips Florida-only lessons for non-Florida users.
@@ -64,16 +68,60 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
                 </div>
                 <span className="text-xl font-semibold text-foreground">Resolve</span>
               </div>
-              <nav className="hidden md:flex space-x-1">
+              <nav className="hidden md:flex space-x-1 items-center">
                 <a href="/" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
                   HOME
                 </a>
-                <a href="/course" className="px-4 py-2 text-sm font-medium text-primary bg-primary/5 rounded-lg">
+                <a
+                  href="/course"
+                  className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                    pathname.startsWith('/course') &&
+                    pathname !== '/course/resources' &&
+                    pathname !== '/course/exam'
+                      ? 'text-primary bg-primary/5'
+                      : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
+                  }`}
+                >
                   COURSE
                 </a>
                 <a href="/parenting-plan" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-primary hover:bg-primary/5 rounded-lg transition-colors">
                   PARENTING PLAN
                 </a>
+                {isFlorida && (
+                  <>
+                    <span className="mx-2 h-5 w-px bg-gray-200" aria-hidden />
+                    <a
+                      href="/course/resources"
+                      className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                        pathname === '/course/resources'
+                          ? 'text-primary bg-primary/5'
+                          : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
+                      }`}
+                    >
+                      RESOURCES
+                    </a>
+                    {examUnlocked ? (
+                      <a
+                        href="/course/exam"
+                        className={`px-4 py-2 text-sm font-medium rounded-lg ${
+                          pathname === '/course/exam'
+                            ? 'text-primary bg-primary/5'
+                            : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
+                        }`}
+                      >
+                        FINAL EXAM
+                      </a>
+                    ) : (
+                      <span
+                        title="Finish all lessons to unlock"
+                        className="px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed inline-flex items-center gap-1"
+                      >
+                        FINAL EXAM
+                        <LockClosedIcon className="w-3.5 h-3.5" />
+                      </span>
+                    )}
+                  </>
+                )}
               </nav>
             </div>
             <button className="w-10 h-10 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors flex items-center justify-center">
@@ -87,23 +135,7 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        <CourseNavSidebar
-          modules={sidebarModules}
-          onLessonClick={handleLessonClick}
-          floridaFooter={
-            isFlorida
-              ? {
-                  examUnlocked: getAllVisibleLessonIds(true).every((id) => completedLessons.has(id)),
-                  examPassed,
-                  resourcesHref: '/course/resources',
-                  examHref: '/course/exam',
-                  certificateHref: '/course/certificate',
-                  currentPath: pathname,
-                  onNavigate: (href) => router.push(href),
-                }
-              : null
-          }
-        />
+        <CourseNavSidebar modules={sidebarModules} onLessonClick={handleLessonClick} />
 
         <div className="flex-1 overflow-y-auto">
           <div className="max-w-7xl mx-auto p-8">
