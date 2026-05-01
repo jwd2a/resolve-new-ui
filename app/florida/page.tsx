@@ -11,16 +11,22 @@ export default function FloridaSignupEntry() {
     // Mirror what the production app would do: flip the admin-only Florida
     // bit on the new user record before sending them into onboarding. In
     // the prototype this lives in localStorage so OnboardingContext picks
-    // it up on hydrate.
+    // it up via its lazy useState initializer on the next mount. The write
+    // must complete before router.replace fires (it does — both are sync).
+    let existing: Record<string, unknown> = {};
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      const existing = raw ? JSON.parse(raw) : {};
+      if (raw) existing = JSON.parse(raw);
+    } catch {
+      // corrupted blob — start fresh so the Florida flag still lands
+    }
+    try {
       localStorage.setItem(
         STORAGE_KEY,
         JSON.stringify({ ...existing, floridaTrack: true, jurisdictionState: 'Florida' }),
       );
     } catch {
-      // ignore
+      // ignore quota / private mode
     }
     router.replace('/onboarding/your-info');
   }, [router]);
