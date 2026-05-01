@@ -26,18 +26,45 @@ export default function LessonVideoContent({
 }: LessonVideoContentProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const maxAllowedTimeRef = useRef(0);
+  // hasCompleted lives in a ref (not state) so the seek-listener effect doesn't
+  // re-attach on every "completed" flip. onComplete is also captured via ref so
+  // inline arrow callbacks from the parent don't churn listeners every render.
+  const hasCompletedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  });
+  const fireComplete = () => {
+    if (!hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      onCompleteRef.current?.();
+    }
+  };
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0); // 0..1
-  const [hasCompleted, setHasCompleted] = useState(false);
+
+  // Prototype-only: when locked but no video asset is wired up yet, treat the
+  // lesson as instantly complete so the page is navigable. Remove this branch
+  // once Florida lesson videos exist.
+  useEffect(() => {
+    if (lockedPlayback && !videoUrl) {
+      fireComplete();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockedPlayback, videoUrl]);
 
   // Lock mode: prevent forward seeks. Allow rewinds.
+  // Tolerance of 0.5s comfortably exceeds the ~250ms timeupdate cadence on all
+  // major browsers, avoiding false snaps during normal playback.
   useEffect(() => {
     if (!lockedPlayback) return;
     const v = videoRef.current;
     if (!v) return;
+    const TOLERANCE = 0.5;
 
     const onTimeUpdate = () => {
-      if (v.currentTime > maxAllowedTimeRef.current + 0.25) {
+      if (v.currentTime > maxAllowedTimeRef.current + TOLERANCE) {
         // user attempted to seek forward (or browser glitched) — snap back
         v.currentTime = maxAllowedTimeRef.current;
       } else {
@@ -46,16 +73,11 @@ export default function LessonVideoContent({
       if (v.duration > 0) setProgress(v.currentTime / v.duration);
     };
     const onSeeking = () => {
-      if (v.currentTime > maxAllowedTimeRef.current + 0.25) {
+      if (v.currentTime > maxAllowedTimeRef.current + TOLERANCE) {
         v.currentTime = maxAllowedTimeRef.current;
       }
     };
-    const onEnded = () => {
-      if (!hasCompleted) {
-        setHasCompleted(true);
-        onComplete?.();
-      }
-    };
+    const onEnded = () => fireComplete();
     const onPlay = () => setIsPlaying(true);
     const onPause = () => setIsPlaying(false);
 
@@ -71,7 +93,8 @@ export default function LessonVideoContent({
       v.removeEventListener('play', onPlay);
       v.removeEventListener('pause', onPause);
     };
-  }, [lockedPlayback, hasCompleted, onComplete]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lockedPlayback]);
 
   const togglePlay = () => {
     const v = videoRef.current;
