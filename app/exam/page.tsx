@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircleIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, LockClosedIcon, KeyIcon } from '@heroicons/react/24/outline';
 import { useOnboarding } from '@/app/onboarding/OnboardingContext';
 import { useCourseProgress } from '@/app/course/CourseProgressContext';
 import { getAllVisibleLessonIds } from '@/app/course/data';
@@ -11,7 +11,7 @@ import { examQuestions, PASSING_THRESHOLD } from './data';
 export default function ExamPage() {
   const router = useRouter();
   const { data } = useOnboarding();
-  const { completedLessons, markExamPassed } = useCourseProgress();
+  const { completedLessons, markExamPassed, markLessonsComplete } = useCourseProgress();
 
   const requiredLessons = useMemo(() => getAllVisibleLessonIds(data.floridaTrack), [data.floridaTrack]);
   const allLessonsComplete = requiredLessons.every((id) => completedLessons.has(id));
@@ -36,9 +36,24 @@ export default function ExamPage() {
           <LockClosedIcon className="w-6 h-6 text-gray-500" />
         </div>
         <h1 className="text-xl font-bold text-gray-900 mb-2">Final Exam — Locked</h1>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 mb-6">
           Finish all required lessons to unlock the exam. {remaining} lesson{remaining === 1 ? '' : 's'} remaining.
         </p>
+        <div className="border-t border-gray-200 pt-5 mt-2">
+          <p className="text-xs uppercase tracking-wider text-gray-400 font-semibold mb-2">
+            Testing
+          </p>
+          <button
+            onClick={() => markLessonsComplete(requiredLessons)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition-colors"
+          >
+            <KeyIcon className="w-4 h-4" />
+            Manually unlock exam (testing)
+          </button>
+          <p className="text-xs text-gray-400 mt-2">
+            Marks all required lessons complete so you can preview the exam flow.
+          </p>
+        </div>
       </div>
     );
   }
@@ -69,7 +84,7 @@ export default function ExamPage() {
           You scored {numCorrect}/{examQuestions.length} ({Math.round(score * 100)}%).
         </p>
         <button
-          onClick={() => router.push('/course/certificate')}
+          onClick={() => router.push('/certificate')}
           className="px-6 py-3 rounded-xl bg-primary text-white font-semibold"
         >
           View your certificate

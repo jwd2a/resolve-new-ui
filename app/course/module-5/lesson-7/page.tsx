@@ -28,7 +28,7 @@ export default function FloridaCoParentingBestPracticesPage() {
       <div className="flex justify-end">
         <button
           disabled={!completed}
-          onClick={() => router.push('/course/exam')}
+          onClick={() => router.push('/exam')}
           className="px-6 py-3 rounded-xl bg-primary text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {completed ? 'Continue to final exam' : 'Watch the full video to continue'}

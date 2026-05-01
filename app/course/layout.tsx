@@ -77,7 +77,7 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
                   className={`px-4 py-2 text-sm font-medium rounded-lg ${
                     pathname.startsWith('/course') &&
                     pathname !== '/course/resources' &&
-                    pathname !== '/course/exam'
+                    pathname !== '/exam'
                       ? 'text-primary bg-primary/5'
                       : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
                   }`}
@@ -102,9 +102,9 @@ function CourseLayoutInner({ children }: { children: React.ReactNode }) {
                     </a>
                     {examUnlocked ? (
                       <a
-                        href="/course/exam"
+                        href="/exam"
                         className={`px-4 py-2 text-sm font-medium rounded-lg ${
-                          pathname === '/course/exam'
+                          pathname === '/exam'
                             ? 'text-primary bg-primary/5'
                             : 'text-gray-600 hover:text-primary hover:bg-primary/5 transition-colors'
                         }`}

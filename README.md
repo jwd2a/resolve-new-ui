@@ -93,8 +93,8 @@ Users who sign up via `/florida` are flagged as `floridaTrack: true`. This unloc
 - Four extra DCFS-required lessons appended to **Module 5: Final Considerations** (lessons 4–7), hidden from non-Florida users
 - A locked video player (no skip / no fast-forward) for those Florida lessons
 - A Resource Center at `/course/resources`
-- A Final Exam at `/course/exam` (locked until all visible lessons complete; passing score 80%)
-- A printable Certificate of Completion at `/course/certificate` (locked until exam passed)
+- A Final Exam at `/exam` (separate from the course layout; locked until all visible lessons complete; passing score 80%; includes a manual unlock button for testing)
+- A printable Certificate of Completion at `/certificate` (locked until exam passed)
 
 To toggle the flag manually for testing:
 

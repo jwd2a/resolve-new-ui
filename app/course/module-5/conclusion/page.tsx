@@ -31,7 +31,7 @@ export default function CourseConclusionPage() {
       setTimeout(() => setCoParentFinished(true), 3000);
     } else if (isFlorida) {
       // Florida-track requires the final exam before the parenting plan is final.
-      router.push('/course/exam');
+      router.push('/exam');
     } else {
       router.push('/parenting-plan');
     }

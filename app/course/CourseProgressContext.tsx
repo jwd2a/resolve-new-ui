@@ -10,6 +10,7 @@ interface CourseProgressState {
 interface CourseProgressContextType extends CourseProgressState {
   isLessonComplete: (lessonKey: string) => boolean;
   markLessonComplete: (lessonKey: string) => void;
+  markLessonsComplete: (lessonKeys: string[]) => void;
   markExamPassed: () => void;
   resetProgress: () => void;
 }
@@ -68,6 +69,23 @@ export function CourseProgressProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const markLessonsComplete = useCallback((lessonKeys: string[]) => {
+    setState((prev) => {
+      const merged = new Set(prev.completedLessons);
+      let changed = false;
+      for (const key of lessonKeys) {
+        if (!merged.has(key)) {
+          merged.add(key);
+          changed = true;
+        }
+      }
+      if (!changed) return prev;
+      const next = { ...prev, completedLessons: merged };
+      persist(next);
+      return next;
+    });
+  }, []);
+
   const markExamPassed = useCallback(() => {
     setState((prev) => {
       if (prev.examPassed) return prev;
@@ -90,6 +108,7 @@ export function CourseProgressProvider({ children }: { children: ReactNode }) {
         examPassed: state.examPassed,
         isLessonComplete,
         markLessonComplete,
+        markLessonsComplete,
         markExamPassed,
         resetProgress,
       }}
