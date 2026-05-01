@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 
 export interface ChildInfo {
   id: string;
@@ -74,26 +74,24 @@ const defaultData: OnboardingData = {
   floridaTrack: false,
 };
 
-const STORAGE_KEY = 'resolve.onboarding.v1';
+export const STORAGE_KEY = 'resolve.onboarding.v1';
 
 const OnboardingContext = createContext<OnboardingContextType | null>(null);
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<OnboardingData>(defaultData);
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-
-  // Hydrate from localStorage on mount so floridaTrack survives navigation.
-  useEffect(() => {
+  const [data, setData] = useState<OnboardingData>(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Partial<OnboardingData>;
-        setData((prev) => ({ ...prev, ...parsed }));
+        return { ...defaultData, ...parsed };
       }
     } catch {
       // ignore — fall back to defaults
     }
-  }, []);
+    return defaultData;
+  });
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
   const updateData = (updates: Partial<OnboardingData>) => {
     setData((prev) => {
