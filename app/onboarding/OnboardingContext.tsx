@@ -38,6 +38,10 @@ export interface OnboardingData {
 
   // Step 5: Target Date
   targetDate: string;
+
+  // Set at signup; admin-only flag, not user-modifiable in real app.
+  // Drives Florida DCFS-track behavior throughout the course.
+  floridaTrack: boolean;
 }
 
 interface OnboardingContextType {
@@ -67,20 +71,42 @@ const defaultData: OnboardingData = {
   children: [{ id: '1', fullName: '', dateOfBirth: '', gender: '' }],
   jurisdictionState: '',
   targetDate: '',
+  floridaTrack: false,
 };
+
+export const STORAGE_KEY = 'resolve.onboarding.v1';
 
 const OnboardingContext = createContext<OnboardingContextType | null>(null);
 
 export function OnboardingProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<OnboardingData>(defaultData);
+  const [data, setData] = useState<OnboardingData>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Partial<OnboardingData>;
+        return { ...defaultData, ...parsed };
+      }
+    } catch {
+      // ignore — fall back to defaults
+    }
+    return defaultData;
+  });
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
   const updateData = (updates: Partial<OnboardingData>) => {
-    setData(prev => ({ ...prev, ...updates }));
+    setData((prev) => {
+      const next = { ...prev, ...updates };
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+      } catch {
+        // ignore quota / private mode
+      }
+      return next;
+    });
   };
 
   const markStepComplete = (step: number) => {
-    setCompletedSteps(prev => new Set(prev).add(step));
+    setCompletedSteps((prev) => new Set(prev).add(step));
   };
 
   return (

@@ -4,6 +4,8 @@ export interface CourseLesson {
   title: string;
   href: string;
   implemented?: boolean;
+  /** Only visible/required when the user is on the Florida track. */
+  floridaOnly?: boolean;
 }
 
 export interface CourseModule {
@@ -70,14 +72,37 @@ export const courseModules: CourseModule[] = [
       { id: 'lesson-1', number: 1, title: 'Number of Overnights', href: '/course/module-5/lesson-1', implemented: true },
       { id: 'lesson-2', number: 2, title: 'Relocation', href: '/course/module-5/lesson-2' },
       { id: 'lesson-3', number: 3, title: 'Changes or Modifications', href: '/course/module-5/lesson-3' },
+      // Florida DCFS-required lessons appended here. Hidden unless floridaTrack is true.
+      { id: 'lesson-4', number: 4, title: 'Domestic Violence and Family Safety', href: '/course/module-5/lesson-4', floridaOnly: true, implemented: true },
+      { id: 'lesson-5', number: 5, title: 'Effects of Divorce on Children', href: '/course/module-5/lesson-5', floridaOnly: true, implemented: true },
+      { id: 'lesson-6', number: 6, title: 'Florida Statutes and the Court Process', href: '/course/module-5/lesson-6', floridaOnly: true, implemented: true },
+      { id: 'lesson-7', number: 7, title: 'Co-Parenting Best Practices', href: '/course/module-5/lesson-7', floridaOnly: true, implemented: true },
     ],
   },
 ];
 
+/**
+ * Returns the modules visible to a user. All modules are always visible
+ * (we don't hide whole modules); call sites should filter lessons by
+ * `floridaOnly` separately if they need to hide individual rows.
+ */
+export function getVisibleModules(isFlorida: boolean): CourseModule[] {
+  return courseModules.map((m) => ({
+    ...m,
+    lessons: m.lessons.filter((l) => isFlorida || !l.floridaOnly),
+  }));
+}
+
+export function getAllVisibleLessonIds(isFlorida: boolean): string[] {
+  return getVisibleModules(isFlorida).flatMap((m) =>
+    m.lessons.map((l) => `${m.id}/${l.id}`),
+  );
+}
+
 export function getFirstImplementedLesson(): string {
   for (const module of courseModules) {
     for (const lesson of module.lessons) {
-      if (lesson.implemented) return lesson.href;
+      if (lesson.implemented && !lesson.floridaOnly) return lesson.href;
     }
   }
   return '/course/module-1/lesson-1';

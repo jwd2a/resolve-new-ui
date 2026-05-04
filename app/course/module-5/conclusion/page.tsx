@@ -5,14 +5,17 @@ import { CheckBadgeIcon } from '@heroicons/react/24/solid';
 import { LightBulbIcon } from '@heroicons/react/24/outline';
 import { useRouter, useSearchParams } from 'next/navigation';
 import CourseCompletionOverlay from '@/app/components/CourseCompletionOverlay';
+import { useOnboarding } from '@/app/onboarding/OnboardingContext';
 
 export default function CourseConclusionPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data } = useOnboarding();
   const [iFinished, setIFinished] = useState(false);
   const [coParentFinished, setCoParentFinished] = useState(false);
 
   const isRemoteSessionActive = searchParams.get('remote') === 'true';
+  const isFlorida = data.floridaTrack;
 
   const keyPoints = [
     'Implement your plan with patience and flexibility.',
@@ -26,6 +29,9 @@ export default function CourseConclusionPage() {
       setIFinished(true);
       // Simulate co-parent finishing after 3 seconds for demo purposes
       setTimeout(() => setCoParentFinished(true), 3000);
+    } else if (isFlorida) {
+      // Florida-track requires the final exam before the parenting plan is final.
+      router.push('/exam');
     } else {
       router.push('/parenting-plan');
     }

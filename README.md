@@ -86,6 +86,25 @@ The default view (no query params) shows the main dashboard with:
 http://localhost:3000/
 ```
 
+### Florida-Approved Course Mode
+
+Users who sign up via `/florida` are flagged as `floridaTrack: true`. This unlocks:
+
+- Four extra DCFS-required lessons appended to **Module 5: Final Considerations** (lessons 4–7), hidden from non-Florida users
+- A locked video player (no skip / no fast-forward) for those Florida lessons
+- A Resource Center at `/course/resources`
+- A Final Exam at `/exam` (separate from the course layout; locked until all visible lessons complete; passing score 80%; includes a manual unlock button for testing)
+- A printable Certificate of Completion at `/certificate` (locked until exam passed)
+
+To toggle the flag manually for testing:
+
+````js
+// Enable Florida mode
+localStorage.setItem('resolve.onboarding.v1', JSON.stringify({ floridaTrack: true }));
+// Disable
+localStorage.removeItem('resolve.onboarding.v1');
+````
+
 ## Project Structure
 
 ```
