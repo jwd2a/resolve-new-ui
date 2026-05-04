@@ -96,13 +96,21 @@ Users who sign up via `/florida` are flagged as `floridaTrack: true`. This unloc
 - A Final Exam at `/exam` (separate from the course layout; locked until all visible lessons complete; passing score 80%; includes a manual unlock button for testing)
 - A printable Certificate of Completion at `/certificate` (locked until exam passed)
 
-To toggle the flag manually for testing:
+#### Demo links (sharable)
+
+Append `?demo=florida` to any page to instantly enable Florida mode and mark every lesson complete. The handler then strips the param and reloads. Examples:
+
+- `/?demo=florida` — dashboard with Florida banner
+- `/exam?demo=florida` — straight to the exam (already unlocked)
+- `/exam?demo=florida-pass` — same, but exam is already passed (certificate unlocked)
+- `/certificate?demo=florida-pass` — straight to the certificate
+
+To reset back to a non-Florida user, run in DevTools:
 
 ````js
-// Enable Florida mode
-localStorage.setItem('resolve.onboarding.v1', JSON.stringify({ floridaTrack: true }));
-// Disable
 localStorage.removeItem('resolve.onboarding.v1');
+localStorage.removeItem('resolve.courseProgress.v1');
+location.reload();
 ````
 
 ## Project Structure
