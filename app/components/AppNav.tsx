@@ -63,7 +63,7 @@ export default function AppNav({ rightExtras, hideAvatar = false }: AppNavProps)
 
   const floridaItems: NavItem[] = isFlorida
     ? [
-        { href: '/course/resources', label: 'Resources' },
+        { href: '/resources', label: 'Resources' },
         {
           href: '/exam',
           label: 'Final Exam',
@@ -79,11 +79,11 @@ export default function AppNav({ rightExtras, hideAvatar = false }: AppNavProps)
       // Dashboard, exam, certificate, resources are NOT considered "course".
       return (
         pathname === '/course' ||
-        (pathname.startsWith('/course/') && pathname !== '/course/resources')
+        (pathname.startsWith('/course/') && pathname !== '/resources')
       );
     }
     if (href === '/exam') return pathname === '/exam';
-    if (href === '/course/resources') return pathname === '/course/resources';
+    if (href === '/resources') return pathname === '/resources';
     return pathname === href || pathname.startsWith(href + '/');
   };
 
